@@ -1,5 +1,5 @@
 ---
-argument-hint: [route-api-specification, common-specification, db-plan, types, tech-stack, backend-rules]
+argument-hint: [route-api-specification, db-plan, types, tech-stack, backend-rules]
 description: Create a plan for API endpoint implementation
 model: claude-sonnet-4-5-20250929
 ---
@@ -10,24 +10,28 @@ Before we begin, review the following information:
 
 1. Route API specification:
 <route_api_specification>
-$1 
-$2 
+$route-api-specification
 </route_api_specification>
 
 2. Related database resources:
 <related_db_resources>
-$3
+$db-plan
 </related_db_resources>
 
 3. Type definitions:
 <type_definitions>
-$4
+$types
 </type_definitions>
 
 3. Tech stack:
 <tech_stack>
-$5
+$tech-stack
 </tech_stack>
+
+4. Implementation rules:
+<implementation_rules>
+$backend-rules
+</implementation_rules>
 
 Your task is to create a comprehensive implementation plan for the REST API endpoint. Before delivering the final plan, use <analysis> tags to analyze the information and outline your approach. In this analysis, ensure that:
 
