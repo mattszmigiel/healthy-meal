@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 import { updateDietaryPreferencesSchema } from "@/lib/schemas/dietaryPreferencesSchemas";
-import { DietaryPreferencesService } from "@/lib/services/dietaryPreferencesService";
+import { DietaryPreferencesService } from "@/lib/services/dietaryPreferences.service";
 import { DEFAULT_USER } from "@/db/supabase.client";
 import type { APIErrorResponse } from "@/types";
 
