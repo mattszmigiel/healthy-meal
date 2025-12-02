@@ -52,9 +52,8 @@ create table public.profiles (
   updated_at timestamptz not null default now()
 );
 
--- Enable RLS on profiles table
--- Required: All Supabase tables must have RLS enabled for security
-alter table public.profiles enable row level security;
+-- Disable RLS on profiles table (development mode)
+alter table public.profiles disable row level security;
 
 -- ----------------------------------------------------------------------------
 -- Table: public.dietary_preferences
@@ -75,8 +74,8 @@ create table public.dietary_preferences (
   updated_at          timestamptz not null default now()
 );
 
--- Enable RLS on dietary_preferences table
-alter table public.dietary_preferences enable row level security;
+-- Disable RLS on dietary_preferences table (development mode)
+alter table public.dietary_preferences disable row level security;
 
 -- ----------------------------------------------------------------------------
 -- Table: public.recipes
@@ -111,8 +110,8 @@ create table public.recipes (
     check (char_length(ingredients) + char_length(instructions) <= 10000)
 );
 
--- Enable RLS on recipes table
-alter table public.recipes enable row level security;
+-- Disable RLS on recipes table (development mode)
+alter table public.recipes disable row level security;
 
 -- ----------------------------------------------------------------------------
 -- Table: public.recipe_ai_metadata
@@ -136,8 +135,8 @@ create table public.recipe_ai_metadata (
   raw_response        jsonb not null
 );
 
--- Enable RLS on recipe_ai_metadata table
-alter table public.recipe_ai_metadata enable row level security;
+-- Disable RLS on recipe_ai_metadata table (development mode)
+alter table public.recipe_ai_metadata disable row level security;
 
 -- ============================================================================
 -- INDEXES
@@ -152,151 +151,6 @@ create index idx_recipes_owner_created_at_desc
 -- Used by: Finding all AI-generated variants of an original recipe
 create index idx_recipes_parent_recipe_id
   on public.recipes (parent_recipe_id);
-
--- ============================================================================
--- ROW LEVEL SECURITY POLICIES
--- ============================================================================
-
--- ----------------------------------------------------------------------------
--- RLS Policies: public.profiles
--- ----------------------------------------------------------------------------
--- Security model: Users can only access their own profile
--- No DELETE policy: users cannot delete their profile directly (admin only)
--- ----------------------------------------------------------------------------
-
--- Policy: Allow authenticated users to select their own profile
-create policy "Profiles select own"
-  on public.profiles
-  for select
-  to authenticated
-  using (user_id = auth.uid());
-
--- Policy: Allow authenticated users to insert their own profile
--- Note: Typically created via trigger, but policy allows client-side creation
-create policy "Profiles insert own"
-  on public.profiles
-  for insert
-  to authenticated
-  with check (user_id = auth.uid());
-
--- Policy: Allow authenticated users to update their own profile
-create policy "Profiles update own"
-  on public.profiles
-  for update
-  to authenticated
-  using (user_id = auth.uid())
-  with check (user_id = auth.uid());
-
--- ----------------------------------------------------------------------------
--- RLS Policies: public.dietary_preferences
--- ----------------------------------------------------------------------------
--- Security model: Users can only access their own dietary preferences
--- No DELETE policy: preferences row is tied 1:1 to profile
--- ----------------------------------------------------------------------------
-
--- Policy: Allow authenticated users to select their own dietary preferences
-create policy "Dietary prefs select own"
-  on public.dietary_preferences
-  for select
-  to authenticated
-  using (user_id = auth.uid());
-
--- Policy: Allow authenticated users to insert their own dietary preferences
--- Note: Typically created via trigger, but policy allows client-side creation
-create policy "Dietary prefs insert own"
-  on public.dietary_preferences
-  for insert
-  to authenticated
-  with check (user_id = auth.uid());
-
--- Policy: Allow authenticated users to update their own dietary preferences
-create policy "Dietary prefs update own"
-  on public.dietary_preferences
-  for update
-  to authenticated
-  using (user_id = auth.uid())
-  with check (user_id = auth.uid());
-
--- ----------------------------------------------------------------------------
--- RLS Policies: public.recipes
--- ----------------------------------------------------------------------------
--- Security model: Users can only access recipes they own
--- Full CRUD operations allowed for own recipes
--- ----------------------------------------------------------------------------
-
--- Policy: Allow authenticated users to select their own recipes
-create policy "Recipes select own"
-  on public.recipes
-  for select
-  to authenticated
-  using (owner_id = auth.uid());
-
--- Policy: Allow authenticated users to insert recipes for themselves
-create policy "Recipes insert own"
-  on public.recipes
-  for insert
-  to authenticated
-  with check (owner_id = auth.uid());
-
--- Policy: Allow authenticated users to update their own recipes
-create policy "Recipes update own"
-  on public.recipes
-  for update
-  to authenticated
-  using (owner_id = auth.uid())
-  with check (owner_id = auth.uid());
-
--- Policy: Allow authenticated users to delete their own recipes
-create policy "Recipes delete own"
-  on public.recipes
-  for delete
-  to authenticated
-  using (owner_id = auth.uid());
-
--- ----------------------------------------------------------------------------
--- RLS Policies: public.recipe_ai_metadata
--- ----------------------------------------------------------------------------
--- Security model: Users can only access metadata for recipes they own
--- Additional check on insert to ensure recipe belongs to user
--- ----------------------------------------------------------------------------
-
--- Policy: Allow authenticated users to select metadata for their own recipes
-create policy "AI metadata select own"
-  on public.recipe_ai_metadata
-  for select
-  to authenticated
-  using (owner_id = auth.uid());
-
--- Policy: Allow authenticated users to insert metadata for their own recipes
--- Extra validation: Ensures the recipe_id references a recipe owned by the user
-create policy "AI metadata insert own"
-  on public.recipe_ai_metadata
-  for insert
-  to authenticated
-  with check (
-    owner_id = auth.uid()
-    and exists (
-      select 1
-      from public.recipes r
-      where r.id = recipe_ai_metadata.recipe_id
-        and r.owner_id = auth.uid()
-    )
-  );
-
--- Policy: Allow authenticated users to update their own metadata
-create policy "AI metadata update own"
-  on public.recipe_ai_metadata
-  for update
-  to authenticated
-  using (owner_id = auth.uid())
-  with check (owner_id = auth.uid());
-
--- Policy: Allow authenticated users to delete their own metadata
-create policy "AI metadata delete own"
-  on public.recipe_ai_metadata
-  for delete
-  to authenticated
-  using (owner_id = auth.uid());
 
 -- ============================================================================
 -- TRIGGERS AND FUNCTIONS
