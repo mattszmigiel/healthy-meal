@@ -1,5 +1,11 @@
 import type { supabaseClient } from "@/db/supabase.client";
-import type { CreateRecipeCommand, RecipeResponseDTO } from "@/types";
+import type {
+  CreateRecipeCommand,
+  RecipeListQueryParams,
+  RecipeListResponseDTO,
+  RecipeResponseDTO,
+  RecipeWithAIMetadataDTO,
+} from "@/types";
 
 type SupabaseClient = typeof supabaseClient;
 
@@ -88,5 +94,85 @@ export class RecipeService {
       .maybeSingle();
 
     return !error && data !== null;
+  }
+
+  /**
+   * Retrieves a paginated list of recipes for a user with optional filters
+   * @param userId - The ID of the user whose recipes to fetch
+   * @param params - Query parameters (page, limit, filters)
+   * @returns Paginated list of recipes with AI metadata
+   * @throws Error if database operation fails
+   */
+  async listUserRecipes(userId: string, params: RecipeListQueryParams): Promise<RecipeListResponseDTO> {
+    const { page = 1, limit = 20, is_ai_generated, parent_recipe_id } = params;
+    const offset = (page - 1) * limit;
+
+    // Build base query for data with user filter (RLS also applies)
+    let dataQuery = this.supabase
+      .from("recipes")
+      .select(
+        `
+        *,
+        ai_metadata:recipe_ai_metadata(*)
+      `
+      )
+      .eq("owner_id", userId)
+      .order("created_at", { ascending: false });
+
+    // Apply optional filters
+    if (is_ai_generated !== undefined) {
+      dataQuery = dataQuery.eq("is_ai_generated", is_ai_generated);
+    }
+
+    if (parent_recipe_id) {
+      dataQuery = dataQuery.eq("parent_recipe_id", parent_recipe_id);
+    }
+
+    // Apply pagination
+    dataQuery = dataQuery.range(offset, offset + limit - 1);
+
+    // Execute data query
+    const { data, error } = await dataQuery;
+
+    if (error) {
+      throw new Error(`Failed to fetch recipes: ${error.message}`);
+    }
+
+    // Build count query with same filters
+    let countQuery = this.supabase.from("recipes").select("*", { count: "exact", head: true }).eq("owner_id", userId);
+
+    if (is_ai_generated !== undefined) {
+      countQuery = countQuery.eq("is_ai_generated", is_ai_generated);
+    }
+
+    if (parent_recipe_id) {
+      countQuery = countQuery.eq("parent_recipe_id", parent_recipe_id);
+    }
+
+    // Execute count query
+    const { count, error: countError } = await countQuery;
+
+    if (countError) {
+      throw new Error(`Failed to count recipes: ${countError.message}`);
+    }
+
+    const total = count ?? 0;
+    const totalPages = Math.ceil(total / limit);
+
+    // Transform data to ensure ai_metadata is single object or null (not array)
+    const transformedData: RecipeWithAIMetadataDTO[] = data.map((recipe) => ({
+      ...recipe,
+      ai_metadata: Array.isArray(recipe.ai_metadata) ? (recipe.ai_metadata[0] ?? null) : recipe.ai_metadata,
+    }));
+
+    return {
+      data: transformedData,
+      pagination: {
+        page,
+        limit,
+        total,
+        total_pages: totalPages,
+      },
+    };
   }
 }
