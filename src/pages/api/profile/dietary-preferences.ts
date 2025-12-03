@@ -26,10 +26,7 @@ export const PUT: APIRoute = async ({ request, locals }) => {
 
     // Update dietary preferences via service (using DEFAULT_USER for testing)
     const service = new DietaryPreferencesService(locals.supabase);
-    const updatedPreferences = await service.updateDietaryPreferences(
-      DEFAULT_USER,
-      validationResult.data
-    );
+    const updatedPreferences = await service.updateDietaryPreferences(DEFAULT_USER, validationResult.data);
 
     return new Response(JSON.stringify(updatedPreferences), {
       status: 200,

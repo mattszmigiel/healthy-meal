@@ -1,8 +1,5 @@
 import type { supabaseClient } from "@/db/supabase.client";
-import type {
-  UpdateDietaryPreferencesCommand,
-  DietaryPreferencesDTO,
-} from "@/types";
+import type { UpdateDietaryPreferencesCommand, DietaryPreferencesDTO } from "@/types";
 
 type SupabaseClient = typeof supabaseClient;
 
