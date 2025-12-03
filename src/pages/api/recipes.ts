@@ -30,10 +30,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     // Validate parent recipe if provided
     if (command.parent_recipe_id) {
-      const isValid = await service.validateParentRecipe(
-        DEFAULT_USER,
-        command.parent_recipe_id
-      );
+      const isValid = await service.validateParentRecipe(DEFAULT_USER, command.parent_recipe_id);
 
       if (!isValid) {
         const errorResponse: APIErrorResponse = {

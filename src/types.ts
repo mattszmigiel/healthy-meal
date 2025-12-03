@@ -84,7 +84,7 @@ export type RecipeWithAIMetadataDTO = RecipeEntity & {
  * Recipe List Response DTO - Response for GET /api/recipes
  * Includes pagination metadata
  */
-export type RecipeListResponseDTO = {
+export interface RecipeListResponseDTO {
   data: RecipeWithAIMetadataDTO[];
   pagination: {
     page: number;
@@ -92,7 +92,7 @@ export type RecipeListResponseDTO = {
     total: number;
     total_pages: number;
   };
-};
+}
 
 /**
  * Single Recipe Response DTO - Response for GET /api/recipes/:id
@@ -124,10 +124,7 @@ export type CreateRecipeCommand = Pick<
  * Update Recipe Command - Request for PUT /api/recipes/:id
  * Only allows updating content fields, includes updated_at for optimistic locking
  */
-export type UpdateRecipeCommand = Pick<
-  RecipeEntity,
-  "title" | "ingredients" | "instructions" | "updated_at"
->;
+export type UpdateRecipeCommand = Pick<RecipeEntity, "title" | "ingredients" | "instructions" | "updated_at">;
 
 // ============================================================================
 // AI RECIPE MODIFICATION DTOs
@@ -136,21 +133,18 @@ export type UpdateRecipeCommand = Pick<
 /**
  * Original Recipe Preview - Simplified recipe info for AI preview response
  */
-export type OriginalRecipePreview = Pick<
-  RecipeEntity,
-  "id" | "title" | "ingredients" | "instructions"
->;
+export type OriginalRecipePreview = Pick<RecipeEntity, "id" | "title" | "ingredients" | "instructions">;
 
 /**
  * Modified Recipe Preview - AI-modified recipe with explanation
  * Not saved to database until user confirms
  */
-export type ModifiedRecipePreview = {
+export interface ModifiedRecipePreview {
   title: string;
   ingredients: string;
   instructions: string;
   explanation: string;
-};
+}
 
 /**
  * Applied Dietary Preferences - Shows which preferences were applied to modification
@@ -164,12 +158,12 @@ export type AppliedDietaryPreferences = Pick<
  * AI Preview Response DTO - Response for POST /api/recipes/:id/ai-preview
  * Provides preview of AI-modified recipe without saving
  */
-export type AIPreviewResponseDTO = {
+export interface AIPreviewResponseDTO {
   original_recipe: OriginalRecipePreview;
   modified_recipe: ModifiedRecipePreview;
   ai_metadata: AIMetadataInput;
   applied_preferences: AppliedDietaryPreferences;
-};
+}
 
 // ============================================================================
 // QUERY PARAMETER TYPES
@@ -178,12 +172,12 @@ export type AIPreviewResponseDTO = {
 /**
  * Recipe List Query Parameters - Query params for GET /api/recipes
  */
-export type RecipeListQueryParams = {
+export interface RecipeListQueryParams {
   page?: number;
   limit?: number;
   is_ai_generated?: boolean;
   parent_recipe_id?: string;
-};
+}
 
 // ============================================================================
 // ERROR RESPONSE TYPES
@@ -193,40 +187,40 @@ export type RecipeListQueryParams = {
  * Standard API Error Response
  * Consistent error structure across all endpoints
  */
-export type APIErrorResponse = {
+export interface APIErrorResponse {
   error: string;
   message: string;
   details?: string[];
-};
+}
 
 /**
  * Conflict Error Response - Specific for optimistic locking failures
  * Used in PUT /api/recipes/:id when updated_at doesn't match
  */
-export type ConflictErrorResponse = {
+export interface ConflictErrorResponse {
   error: "Conflict";
   message: string;
   current_version: {
     updated_at: string;
   };
-};
+}
 
 /**
  * Rate Limit Error Response - Specific for rate limit exceeded
  * Used in POST /api/recipes/:id/ai-preview
  */
-export type RateLimitErrorResponse = {
+export interface RateLimitErrorResponse {
   error: "Rate limit exceeded";
   message: string;
   retry_after: number;
-};
+}
 
 /**
  * No Preferences Error Response - Specific for missing dietary preferences
  * Used in POST /api/recipes/:id/ai-preview
  */
-export type NoPreferencesErrorResponse = {
+export interface NoPreferencesErrorResponse {
   error: "No dietary preferences";
   message: string;
   action: string;
-};
+}

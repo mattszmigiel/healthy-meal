@@ -29,11 +29,7 @@ export const updateDietaryPreferencesSchema = z
   .refine(
     (data) => {
       // Ensure at least one field is provided
-      return (
-        data.diet_type !== undefined ||
-        data.allergies !== undefined ||
-        data.disliked_ingredients !== undefined
-      );
+      return data.diet_type !== undefined || data.allergies !== undefined || data.disliked_ingredients !== undefined;
     },
     {
       message: "At least one field must be provided",
