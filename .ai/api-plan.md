@@ -15,36 +15,6 @@ The API is organized around the following main resources:
 
 ## 2. Endpoints
 
-### 2.1 Profile Management
-
-#### Get Current User Profile
-
-**Endpoint**: `GET /api/profile`
-
-**Description**: Retrieves the authenticated user's profile information.
-
-**Authentication**: Required (JWT token)
-
-**Query Parameters**: None
-
-**Request Body**: None
-
-**Response** (200 OK):
-```json
-{
-  "user_id": "uuid",
-  "created_at": "2024-01-15T10:30:00Z",
-  "updated_at": "2024-01-15T10:30:00Z"
-}
-```
-
-**Error Responses**:
-- `401 Unauthorized`: User not authenticated
-- `404 Not Found`: Profile not found (should not occur due to trigger)
-
----
-
-
 ### 2.2 Dietary Preferences Management
 
 #### Get Dietary Preferences

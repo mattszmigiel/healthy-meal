@@ -2,33 +2,16 @@ import { z } from "zod";
 
 export const createRecipeSchema = z
   .object({
-    title: z
-      .string()
-      .trim()
-      .min(1, "Title is required")
-      .max(200, "Title must not exceed 200 characters"),
-    ingredients: z
-      .string()
-      .trim()
-      .min(1, "Ingredients are required"),
-    instructions: z
-      .string()
-      .trim()
-      .min(1, "Instructions are required"),
+    title: z.string().trim().min(1, "Title is required").max(200, "Title must not exceed 200 characters"),
+    ingredients: z.string().trim().min(1, "Ingredients are required"),
+    instructions: z.string().trim().min(1, "Instructions are required"),
     is_ai_generated: z.boolean(),
-    parent_recipe_id: z
-      .string()
-      .uuid("Invalid parent recipe ID format")
-      .nullable()
-      .default(null),
+    parent_recipe_id: z.string().uuid("Invalid parent recipe ID format").nullable().default(null),
     ai_metadata: z
       .object({
         model: z.string().min(1, "Model is required"),
         provider: z.string().min(1, "Provider is required"),
-        generation_duration: z
-          .number()
-          .int()
-          .positive("Generation duration must be positive"),
+        generation_duration: z.number().int().positive("Generation duration must be positive"),
         raw_response: z.record(z.any()),
       })
       .nullable()
@@ -40,8 +23,7 @@ export const createRecipeSchema = z
       return totalLength <= 10000;
     },
     {
-      message:
-        "Combined ingredients and instructions must not exceed 10,000 characters",
+      message: "Combined ingredients and instructions must not exceed 10,000 characters",
       path: ["ingredients"],
     }
   )

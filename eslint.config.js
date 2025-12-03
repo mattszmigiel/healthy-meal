@@ -9,6 +9,7 @@ import eslintPluginReactHooks from "eslint-plugin-react-hooks";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import tseslint from "typescript-eslint";
+import { globalIgnores } from "eslint/config";
 
 // File path setup
 const __filename = fileURLToPath(import.meta.url);
@@ -62,5 +63,6 @@ export default tseslint.config(
   jsxA11yConfig,
   reactConfig,
   eslintPluginAstro.configs["flat/recommended"],
-  eslintPluginPrettier
+  eslintPluginPrettier,
+  [globalIgnores(["src/db/database.types.ts"])]
 );
