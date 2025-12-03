@@ -30,10 +30,6 @@ export class DietaryPreferencesService {
       throw new Error("DATABASE_ERROR");
     }
 
-    if (!data) {
-      throw new Error("DIETARY_PREFERENCES_NOT_FOUND");
-    }
-
     return data;
   }
 
@@ -79,10 +75,6 @@ export class DietaryPreferencesService {
       }
       console.error("Error updating dietary preferences:", error);
       throw new Error("DATABASE_ERROR");
-    }
-
-    if (!data) {
-      throw new Error("DIETARY_PREFERENCES_NOT_FOUND");
     }
 
     return data;
