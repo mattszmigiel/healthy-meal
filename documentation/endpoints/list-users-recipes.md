@@ -4,8 +4,6 @@
 
 **Description**: Retrieves a paginated list of the authenticated user's recipes.
 
-**Authentication**: Required (JWT token)
-
 **Query Parameters**:
 - `page` (integer, optional, default: 1): Page number (1-indexed)
 - `limit` (integer, optional, default: 20, max: 100): Number of items per page
@@ -63,7 +61,6 @@
 **Note**: `ai_metadata` is included in the response if the recipe is AI-generated.
 
 **Error Responses**:
-- `401 Unauthorized`: User not authenticated
 - `400 Bad Request`: Invalid query parameters
 
 ---

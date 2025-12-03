@@ -114,7 +114,8 @@ export class RecipeService {
         `
         *,
         ai_metadata:recipe_ai_metadata(*)
-      `
+      `,
+        { count: "exact" }
       )
       .eq("owner_id", userId)
       .order("created_at", { ascending: false });
@@ -132,28 +133,10 @@ export class RecipeService {
     dataQuery = dataQuery.range(offset, offset + limit - 1);
 
     // Execute data query
-    const { data, error } = await dataQuery;
+    const { data, error, count } = await dataQuery;
 
     if (error) {
       throw new Error(`Failed to fetch recipes: ${error.message}`);
-    }
-
-    // Build count query with same filters
-    let countQuery = this.supabase.from("recipes").select("*", { count: "exact", head: true }).eq("owner_id", userId);
-
-    if (is_ai_generated !== undefined) {
-      countQuery = countQuery.eq("is_ai_generated", is_ai_generated);
-    }
-
-    if (parent_recipe_id) {
-      countQuery = countQuery.eq("parent_recipe_id", parent_recipe_id);
-    }
-
-    // Execute count query
-    const { count, error: countError } = await countQuery;
-
-    if (countError) {
-      throw new Error(`Failed to count recipes: ${countError.message}`);
     }
 
     const total = count ?? 0;
