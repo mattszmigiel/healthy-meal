@@ -6,6 +6,49 @@ import type { APIErrorResponse } from "@/types";
 
 export const prerender = false;
 
+/**
+ * GET /api/profile/dietary-preferences
+ * Retrieves the authenticated user's dietary preferences
+ */
+export const GET: APIRoute = async ({ locals }) => {
+  try {
+    // Get dietary preferences via service (using DEFAULT_USER for testing)
+    const service = new DietaryPreferencesService(locals.supabase);
+    const preferences = await service.getDietaryPreferences(DEFAULT_USER);
+
+    return new Response(JSON.stringify(preferences), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    // Handle service errors
+    if (error instanceof Error) {
+      if (error.message === "DIETARY_PREFERENCES_NOT_FOUND") {
+        const errorResponse: APIErrorResponse = {
+          error: "Not Found",
+          message: "Dietary preferences not found for user",
+        };
+        return new Response(JSON.stringify(errorResponse), {
+          status: 404,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+    }
+
+    // Log server errors
+    console.error("Unexpected error fetching dietary preferences:", error);
+
+    const errorResponse: APIErrorResponse = {
+      error: "Internal Server Error",
+      message: "An unexpected error occurred",
+    };
+    return new Response(JSON.stringify(errorResponse), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+};
+
 export const PUT: APIRoute = async ({ request, locals }) => {
   try {
     // Parse and validate request body
@@ -26,10 +69,7 @@ export const PUT: APIRoute = async ({ request, locals }) => {
 
     // Update dietary preferences via service (using DEFAULT_USER for testing)
     const service = new DietaryPreferencesService(locals.supabase);
-    const updatedPreferences = await service.updateDietaryPreferences(
-      DEFAULT_USER,
-      validationResult.data
-    );
+    const updatedPreferences = await service.updateDietaryPreferences(DEFAULT_USER, validationResult.data);
 
     return new Response(JSON.stringify(updatedPreferences), {
       status: 200,

@@ -1,8 +1,5 @@
 import type { supabaseClient } from "@/db/supabase.client";
-import type {
-  UpdateDietaryPreferencesCommand,
-  DietaryPreferencesDTO,
-} from "@/types";
+import type { UpdateDietaryPreferencesCommand, DietaryPreferencesDTO } from "@/types";
 
 type SupabaseClient = typeof supabaseClient;
 
@@ -11,6 +8,34 @@ type SupabaseClient = typeof supabaseClient;
  */
 export class DietaryPreferencesService {
   constructor(private supabase: SupabaseClient) {}
+
+  /**
+   * Retrieves dietary preferences for a user
+   *
+   * @param userId - The authenticated user's ID
+   * @returns The user's dietary preferences
+   * @throws Error with specific codes for different failure scenarios
+   */
+  async getDietaryPreferences(userId: string): Promise<DietaryPreferencesDTO> {
+    // Query dietary preferences with RLS enforcement
+    const { data, error } = await this.supabase.from("dietary_preferences").select("*").eq("user_id", userId).single();
+
+    // Handle errors
+    if (error) {
+      // PGRST116 = no rows returned (not found)
+      if (error.code === "PGRST116") {
+        throw new Error("DIETARY_PREFERENCES_NOT_FOUND");
+      }
+      console.error("Error fetching dietary preferences:", error);
+      throw new Error("DATABASE_ERROR");
+    }
+
+    if (!data) {
+      throw new Error("DIETARY_PREFERENCES_NOT_FOUND");
+    }
+
+    return data;
+  }
 
   /**
    * Updates dietary preferences for a user
