@@ -194,4 +194,23 @@ export class RecipeService {
       },
     };
   }
+
+  /**
+   * Deletes a recipe by ID
+   * RLS policy ensures only the owner can delete their recipe
+   * @param recipeId - The unique identifier of the recipe to delete
+   * @returns true if recipe was deleted, false if not found or unauthorized
+   * @throws Error if database operation fails (excluding not found)
+   */
+  async deleteRecipe(recipeId: string): Promise<boolean> {
+    const { error, count } = await this.supabase.from("recipes").delete({ count: "exact" }).eq("id", recipeId);
+
+    if (error) {
+      throw new Error(`Failed to delete recipe: ${error.message}`);
+    }
+
+    // count === 0 means recipe not found or RLS filtered (user doesn't own it)
+    // count === 1 means recipe was successfully deleted
+    return (count ?? 0) > 0;
+  }
 }
