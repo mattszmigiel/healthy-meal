@@ -73,3 +73,64 @@ export const GET: APIRoute = async ({ params, locals }) => {
     });
   }
 };
+
+/**
+ * DELETE /api/recipes/:id
+ * Deletes a recipe by ID
+ * Returns 204 if successful, 404 if not found or not owned by user (RLS filtered)
+ */
+export const DELETE: APIRoute = async ({ params, locals }) => {
+  try {
+    // Extract recipe ID from path params
+    const recipeId = params.id;
+
+    // Validate UUID format
+    const validation = RecipeIdParamSchema.safeParse({ id: recipeId });
+    if (!validation.success) {
+      const errorResponse: APIErrorResponse = {
+        error: "Bad Request",
+        message: "Invalid recipe ID format",
+      };
+      return new Response(JSON.stringify(errorResponse), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    // Get Supabase client from context
+    const supabase = locals.supabase;
+
+    // Delete recipe via service
+    const service = new RecipeService(supabase);
+    const deleted = await service.deleteRecipe(validation.data.id);
+
+    // Handle not found (includes RLS filtered)
+    if (!deleted) {
+      const errorResponse: APIErrorResponse = {
+        error: "Not Found",
+        message: "Recipe not found",
+      };
+      return new Response(JSON.stringify(errorResponse), {
+        status: 404,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    // Return success response with empty body
+    return new Response(null, {
+      status: 204,
+    });
+  } catch (error) {
+    // Handle unexpected errors
+    console.error("Error deleting recipe:", error);
+
+    const errorResponse: APIErrorResponse = {
+      error: "Internal Server Error",
+      message: "An unexpected error occurred",
+    };
+    return new Response(JSON.stringify(errorResponse), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+};
