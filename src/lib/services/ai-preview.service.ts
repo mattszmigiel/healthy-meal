@@ -39,14 +39,18 @@ export class AIPreviewService {
    * @throws Error with specific error codes for different failure scenarios
    */
   async generateAIPreview(recipeId: string, userId: string): Promise<AIPreviewResponseDTO> {
-    // Fetch recipe and validate ownership
-    const recipe = await this.fetchRecipeWithValidation(recipeId, userId);
+    // Fetch recipe and preferences in parallel for better performance
+    const [recipe, preferences] = await Promise.all([
+      this.fetchRecipeWithValidation(recipeId, userId),
+      this.fetchAndValidatePreferences(userId),
+    ]);
+
+    // Validate recipe exists and user has access
     if (!recipe) {
       throw new Error(AI_PREVIEW_ERRORS.RECIPE_NOT_FOUND);
     }
 
-    // Fetch and validate dietary preferences
-    const preferences = await this.fetchAndValidatePreferences(userId);
+    // Validate preferences exist and have at least one value
     if (!preferences || !this.hasValidPreferences(preferences)) {
       throw new Error(AI_PREVIEW_ERRORS.NO_PREFERENCES);
     }
