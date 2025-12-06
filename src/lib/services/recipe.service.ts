@@ -97,6 +97,42 @@ export class RecipeService {
   }
 
   /**
+   * Fetches a single recipe by ID with AI metadata
+   * Returns null if recipe not found or user doesn't own it (RLS filtered)
+   * @param recipeId - The unique identifier of the recipe
+   * @returns Recipe with AI metadata or null if not found
+   * @throws Error if database operation fails (excluding not found)
+   */
+  async getRecipeById(recipeId: string): Promise<RecipeResponseDTO | null> {
+    const { data, error } = await this.supabase
+      .from("recipes")
+      .select(
+        `
+        *,
+        ai_metadata:recipe_ai_metadata(*)
+      `
+      )
+      .eq("id", recipeId)
+      .single();
+
+    if (error) {
+      // Handle "not found" vs actual errors
+      if (error.code === "PGRST116") {
+        // No rows returned (not found or RLS filtered)
+        return null;
+      }
+      // Re-throw actual errors
+      throw error;
+    }
+
+    // Transform ai_metadata from array to object or null
+    return {
+      ...data,
+      ai_metadata: Array.isArray(data.ai_metadata) ? (data.ai_metadata[0] ?? null) : data.ai_metadata,
+    };
+  }
+
+  /**
    * Retrieves a paginated list of recipes for a user with optional filters
    * @param userId - The ID of the user whose recipes to fetch
    * @param params - Query parameters (page, limit, filters)
