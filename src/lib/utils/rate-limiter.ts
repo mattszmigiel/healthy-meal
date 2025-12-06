@@ -25,6 +25,9 @@ const MAX_REQUESTS_PER_WINDOW = 10;
 // Cleanup interval (every 5 minutes)
 const CLEANUP_INTERVAL_MS = 5 * 60 * 1000;
 
+// Store cleanup interval reference for graceful shutdown
+let cleanupInterval: NodeJS.Timeout | undefined;
+
 /**
  * Periodically cleans up expired rate limit entries to prevent memory leaks
  */
@@ -45,7 +48,7 @@ function cleanupExpiredEntries(): void {
 
 // Start periodic cleanup
 if (typeof setInterval !== "undefined") {
-  setInterval(cleanupExpiredEntries, CLEANUP_INTERVAL_MS);
+  cleanupInterval = setInterval(cleanupExpiredEntries, CLEANUP_INTERVAL_MS);
 }
 
 /**
@@ -134,4 +137,23 @@ export function getRateLimitStatus(userId: string): { count: number; resetAt: nu
     count: entry.count,
     resetAt: entry.resetAt,
   };
+}
+
+/**
+ * Cleanup function for graceful shutdown
+ * Clears the cleanup interval and all rate limit entries
+ * Useful for testing, hot reload, and application shutdown
+ *
+ * @example
+ * ```typescript
+ * // In test teardown or application shutdown
+ * cleanup();
+ * ```
+ */
+export function cleanup(): void {
+  if (cleanupInterval) {
+    clearInterval(cleanupInterval);
+    cleanupInterval = undefined;
+  }
+  rateLimitStore.clear();
 }

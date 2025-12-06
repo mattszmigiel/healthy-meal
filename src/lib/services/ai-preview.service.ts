@@ -10,6 +10,7 @@ import type {
   AIMetadataInput,
 } from "@/types";
 import { generateMockedAIPreview } from "./mocked-ai.service";
+import { logger, getErrorStack } from "@/lib/utils/logger";
 
 type SupabaseClient = typeof supabaseClient;
 
@@ -54,7 +55,12 @@ export class AIPreviewService {
     let aiResponse;
     try {
       aiResponse = await generateMockedAIPreview(recipe, preferences);
-    } catch {
+    } catch (error) {
+      logger.error("AI service call failed", {
+        user_id: userId,
+        recipe_id: recipeId,
+        error_stack: getErrorStack(error),
+      });
       throw new Error(AI_PREVIEW_ERRORS.AI_SERVICE_ERROR);
     }
 
