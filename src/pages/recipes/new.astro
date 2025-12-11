@@ -1,0 +1,13 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { AddRecipeForm } from "@/components/recipes/AddRecipeForm";
+
+// Disable prerendering since this is a dynamic page
+export const prerender = false;
+---
+
+<Layout title="Create Recipe">
+  <main class="container mx-auto px-4 py-8">
+    <AddRecipeForm client:load />
+  </main>
+</Layout>
