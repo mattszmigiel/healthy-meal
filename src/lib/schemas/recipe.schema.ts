@@ -24,7 +24,7 @@ export const createRecipeSchema = z
     },
     {
       message: "Combined ingredients and instructions must not exceed 10,000 characters",
-      path: ["ingredients"],
+      path: ["combined"],
     }
   )
   .refine(
