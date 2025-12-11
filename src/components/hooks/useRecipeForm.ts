@@ -278,8 +278,9 @@ export function useRecipeForm(): UseRecipeFormReturn {
             });
           }
         }
-      } catch {
-        // Network error
+      } catch (error) {
+        // Network error - log for debugging
+        console.error("Failed to submit recipe:", error);
         setErrors({
           general: "Network error. Please check your connection and try again.",
         });
