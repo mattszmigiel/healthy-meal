@@ -313,7 +313,7 @@ export interface VariantCardProps {
  * Props for CompareView component
  */
 export interface CompareViewProps {
-  original: RecipeEntity;
+  parentRecipeId: string;
   modified: RecipeEntity;
 }
 

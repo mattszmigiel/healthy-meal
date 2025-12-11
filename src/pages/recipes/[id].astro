@@ -1,0 +1,70 @@
+---
+import { z } from "zod";
+import Layout from "@/layouts/Layout.astro";
+import { RecipeDetailView } from "@/components/recipes/RecipeDetailView";
+import { RecipeService } from "@/lib/services/recipe.service";
+import type { RecipeResponseDTO } from "@/types";
+
+// Disable prerendering since this is a dynamic page
+export const prerender = false;
+
+/**
+ * Validation schema for recipe ID path parameter
+ */
+const RecipeIdParamSchema = z.object({
+  id: z.string().uuid({ message: "Invalid recipe ID format" }),
+});
+
+// Extract and validate recipe ID
+const recipeId = Astro.params.id;
+const validation = RecipeIdParamSchema.safeParse({ id: recipeId });
+
+// Handle invalid UUID format (400)
+if (!validation.success) {
+  return Astro.redirect("/404");
+}
+
+// Fetch recipe server-side
+let recipe: RecipeResponseDTO | null = null;
+let fetchError: string | null = null;
+
+try {
+  const supabase = Astro.locals.supabase;
+  const service = new RecipeService(supabase);
+  recipe = await service.getRecipeById(validation.data.id);
+
+  // Handle not found (404)
+  if (!recipe) {
+    return Astro.redirect("/404");
+  }
+} catch (error) {
+  console.error("Error fetching recipe for SSR:", error);
+  fetchError = "Failed to load recipe";
+}
+
+// Generate page title
+const pageTitle = recipe ? recipe.title : "Recipe Not Found";
+---
+
+<Layout title={pageTitle}>
+  <main>
+    {
+      fetchError || !recipe ? (
+        <div class="max-w-4xl mx-auto px-4 py-8">
+          <div class="rounded-lg border border-destructive bg-destructive/10 p-6 text-center">
+            <h1 class="text-2xl font-bold text-destructive mb-2">Error Loading Recipe</h1>
+            <p class="text-muted-foreground mb-4">{fetchError || "Recipe not found"}</p>
+            <a
+              href="/recipes"
+              class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-primary text-primary-foreground hover:bg-primary/90 h-10 py-2 px-4"
+            >
+              Go to Recipes
+            </a>
+          </div>
+        </div>
+      ) : (
+        <RecipeDetailView client:load initialRecipe={recipe} recipeId={validation.data.id} />
+      )
+    }
+  </main>
+</Layout>

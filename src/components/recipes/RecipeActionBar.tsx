@@ -106,42 +106,40 @@ function TrashIcon({ className }: { className?: string }) {
  */
 export function RecipeActionBar({ isAiGenerated, onModifyWithAI, onEdit, onDelete }: RecipeActionBarProps) {
   return (
-    <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
-      <div className="flex items-center justify-between gap-3 py-4">
-        {/* Primary Actions */}
-        <div className="flex items-center gap-2 flex-wrap">
-          {/* Modify with AI - Only show for non-AI recipes */}
-          {!isAiGenerated && (
-            <Button onClick={onModifyWithAI} className="gap-2">
-              <SparklesIcon className="h-4 w-4" />
-              <span className="hidden sm:inline">Modify with AI</span>
-              <span className="sm:hidden">AI Modify</span>
-            </Button>
-          )}
-
-          {/* Edit Button */}
-          <Button onClick={onEdit} variant="outline" className="gap-2">
-            <PencilIcon className="h-4 w-4" />
-            <span className="hidden sm:inline">Edit</span>
-            <span className="sr-only sm:not-sr-only">Edit Recipe</span>
+    <div className="flex items-center justify-between gap-3 py-4">
+      {/* Primary Actions */}
+      <div className="flex items-center gap-2 flex-wrap">
+        {/* Modify with AI - Only show for non-AI recipes */}
+        {!isAiGenerated && (
+          <Button onClick={onModifyWithAI} className="gap-2">
+            <SparklesIcon className="h-4 w-4" />
+            <span className="hidden sm:inline">Modify with AI</span>
+            <span className="sm:hidden">AI Modify</span>
           </Button>
-        </div>
+        )}
 
-        {/* Overflow Menu */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="icon" aria-label="More actions">
-              <MoreVerticalIcon className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={onDelete} className="text-destructive focus:text-destructive gap-2">
-              <TrashIcon className="h-4 w-4" />
-              <span>Delete</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {/* Edit Button */}
+        <Button onClick={onEdit} variant="outline" className="gap-2">
+          <PencilIcon className="h-4 w-4" />
+          <span className="hidden sm:inline">Edit Recipe</span>
+          <span className="sm:hidden">Edit</span>
+        </Button>
       </div>
+
+      {/* Overflow Menu */}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" size="icon" aria-label="More actions">
+            <MoreVerticalIcon className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={onDelete} className="text-destructive focus:text-destructive gap-2">
+            <TrashIcon className="h-4 w-4" />
+            <span>Delete</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 }
