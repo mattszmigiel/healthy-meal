@@ -1,5 +1,5 @@
 ---
-argument-hint: [prd, view-description, user-stories, endpoint-description, endpoint-implementation, types, tech-stack]
+argument-hint: [prd, view-description, user-stories, endpoint-description, endpoint-implementation, types, tech-stack, shad]
 description: Create a plan for rest API
 model: claude-sonnet-4-5-20250929
 ---

@@ -1,0 +1,60 @@
+## 2.6 Recipe Detail Page
+
+- **View name**: Recipe Detail
+- **Path**: `/recipes/[id]`
+- **Main purpose**:
+  - Present full recipe content.
+  - Provide primary entry point to AI modification, editing, and deletion.
+  - For AI recipes: show relationship to original and support comparison.
+- **Key information to display**:
+  - Recipe title.
+  - Creation date, last modified date.
+  - Ingredients (plain text).
+  - Instructions (plain text).
+  - Indicators:
+    - "AI Modified" badge if `is_ai_generated=true`.
+    - Link to parent/original recipe if AI-generated.
+  - AI variants:
+    - For an original recipe, list AI-modified children.
+  - For AI recipes: compare view with original.
+- **Key view components**:
+  - **Sticky action bar** (top of viewport / page):
+    - Primary button: "Modify with AI" (for original recipes and maybe AI ones if allowed).
+    - Secondary: "Edit".
+    - Overflow menu with "Delete" (and potentially other actions).
+  - **Content sections**:
+    - `h1` Title.
+    - Metadata (created/updated timestamps).
+    - Ingredients section: heading + body.
+    - Instructions section: heading + body.
+  - **AI indicators**:
+    - For AI recipes:
+      - Badge "AI Modified".
+      - Text "Adapted from: [Original Recipe Title]" (link to parent).
+  - **AI variants section** (for originals):
+    - Collapsible section: "AI Modified Versions (X)".
+    - Chevon icon, collapsed by default.
+    - Inside: list of variant cards:
+      - Title.
+      - Creation date.
+      - Optionally a summary of preferences used.
+  - **Compare with Original section** (for AI recipes):
+    - Collapsible section.
+    - When open:
+      - Two-column layout on desktop; stacked on mobile.
+      - Left: original ingredients & instructions.
+      - Right: AI-modified version.
+      - Differences visually indicated (e.g., additions highlighted, removals struck-through).
+- **UX, accessibility, and security considerations**:
+  - Breadcrumb/"Back to recipes" link for easy navigation.
+  - Collapsibles use buttons with `aria-expanded` and `aria-controls`.
+  - Comparison view ensures color is not the sole differentiator; uses text markers (e.g., "Replaced X with Y").
+  - Delete action does not occur immediately; must confirm in a separate dialog.
+  - All data fetched via `/api/recipes/:id` + optionally `/api/recipes?parent_recipe_id=...`; RLS ensures only owner's data is returned.
+- **API alignment**:
+  - `GET /api/recipes/:id` for base recipe.
+  - `GET /api/recipes?parent_recipe_id=:id` for its AI variants.
+  - For AI recipes, additional `GET /api/recipes/:parentId` to retrieve original for comparison.
+- **Related requirements**:
+  - FR-011–FR-013, FR-019–FR-024, FR-026–FR-028, FR-030–FR-032
+  - US-005, US-012, US-013, US-014, US-017, US-018, US-021, US-020
