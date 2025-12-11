@@ -18,6 +18,9 @@ import {
 } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 
+// UI-specific constants
+const CHARACTER_WARNING_THRESHOLD = 0.9;
+
 export function AddRecipeForm() {
   const {
     formData,
@@ -103,7 +106,7 @@ export function AddRecipeForm() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6" aria-busy={isSubmitting}>
         {/* Page Header */}
         <div className="space-y-2">
           <h1 className="text-3xl font-bold tracking-tight">Create Recipe</h1>
@@ -123,7 +126,11 @@ export function AddRecipeForm() {
             <Label htmlFor="title" className="text-base font-medium">
               Title <span className="text-destructive">*</span>
             </Label>
-            <CharacterCounter current={titleCharCount.current} max={titleCharCount.max} warningThreshold={0.9} />
+            <CharacterCounter
+              current={titleCharCount.current}
+              max={titleCharCount.max}
+              warningThreshold={CHARACTER_WARNING_THRESHOLD}
+            />
           </div>
           <Input
             ref={titleRef}
@@ -201,7 +208,11 @@ export function AddRecipeForm() {
         {/* Combined Character Counter */}
         <div className="flex items-center justify-between rounded-lg border border-border bg-muted/50 p-3">
           <span className="text-sm text-muted-foreground">Combined content length (ingredients + instructions)</span>
-          <CharacterCounter current={combinedCharCount.current} max={combinedCharCount.max} warningThreshold={0.9} />
+          <CharacterCounter
+            current={combinedCharCount.current}
+            max={combinedCharCount.max}
+            warningThreshold={CHARACTER_WARNING_THRESHOLD}
+          />
         </div>
 
         {/* Combined Length Error */}

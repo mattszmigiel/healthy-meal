@@ -5,6 +5,13 @@ import { createRecipeSchema } from "@/lib/schemas/recipe.schema";
 import type { CreateRecipeCommand, RecipeResponseDTO, APIErrorResponse } from "@/types";
 
 // ============================================================================
+// CONSTANTS
+// ============================================================================
+
+export const TITLE_MAX_LENGTH = 200;
+export const COMBINED_CONTENT_MAX_LENGTH = 10000;
+
+// ============================================================================
 // TYPE DEFINITIONS
 // ============================================================================
 
@@ -143,10 +150,10 @@ export function useRecipeForm(): UseRecipeFormReturn {
   const [isSuccessfullySubmitted, setIsSuccessfullySubmitted] = useState(false);
 
   // Computed values
-  const titleCharCount = useMemo(() => calculateCharCount(formData.title, 200), [formData.title]);
+  const titleCharCount = useMemo(() => calculateCharCount(formData.title, TITLE_MAX_LENGTH), [formData.title]);
 
   const combinedCharCount = useMemo(
-    () => calculateCharCount(formData.ingredients + formData.instructions, 10000),
+    () => calculateCharCount(formData.ingredients + formData.instructions, COMBINED_CONTENT_MAX_LENGTH),
     [formData.ingredients, formData.instructions]
   );
 
