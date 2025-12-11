@@ -264,19 +264,22 @@ export function useRecipeForm(): UseRecipeFormReturn {
           setTimeout(() => {
             navigate(`/recipes/${recipe.id}`);
           }, 500);
-        } else {
-          // Error: parse and display
-          const error: APIErrorResponse = await response.json();
 
-          if (response.status === 400) {
-            // Validation error from server
-            setErrors(handleServerValidationErrors(error));
-          } else {
-            // General server error
-            setErrors({
-              general: error.message || "An error occurred while saving the recipe",
-            });
-          }
+          // Don't clear isSubmitting on success - component will unmount during navigation
+          return;
+        }
+
+        // Error: parse and display
+        const error: APIErrorResponse = await response.json();
+
+        if (response.status === 400) {
+          // Validation error from server
+          setErrors(handleServerValidationErrors(error));
+        } else {
+          // General server error
+          setErrors({
+            general: error.message || "An error occurred while saving the recipe",
+          });
         }
       } catch (error) {
         // Network error - log for debugging
@@ -285,7 +288,7 @@ export function useRecipeForm(): UseRecipeFormReturn {
           general: "Network error. Please check your connection and try again.",
         });
       } finally {
-        // Clear loading state
+        // Clear loading state only on errors (success path returns early)
         setIsSubmitting(false);
       }
     },
