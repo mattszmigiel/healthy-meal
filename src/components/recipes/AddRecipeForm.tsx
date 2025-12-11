@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState } from "react";
+import { navigate } from "astro:transitions/client";
 import { useRecipeForm } from "@/components/hooks/useRecipeForm";
 import { CharacterCounter } from "./CharacterCounter";
 import { Button } from "@/components/ui/button";
@@ -87,7 +88,7 @@ export function AddRecipeForm() {
       setShowCancelDialog(true);
     } else {
       setIsCancelling(true);
-      window.location.href = "/recipes";
+      navigate("/recipes");
     }
   };
 
@@ -96,7 +97,7 @@ export function AddRecipeForm() {
     setIsCancelling(true);
     // Small timeout to ensure state is updated before navigation
     setTimeout(() => {
-      window.location.href = "/recipes";
+      navigate("/recipes");
     }, 0);
   };
 

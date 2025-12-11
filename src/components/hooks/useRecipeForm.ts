@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
+import { navigate } from "astro:transitions/client";
 import { toast } from "sonner";
 import { createRecipeSchema } from "@/lib/schemas/recipe.schema";
 import type { CreateRecipeCommand, RecipeResponseDTO, APIErrorResponse } from "@/types";
@@ -261,7 +262,7 @@ export function useRecipeForm(): UseRecipeFormReturn {
 
           // Navigate after a brief delay to show the toast
           setTimeout(() => {
-            window.location.href = `/recipes/${recipe.id}`;
+            navigate(`/recipes/${recipe.id}`);
           }, 500);
         } else {
           // Error: parse and display
