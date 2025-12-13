@@ -1,5 +1,5 @@
 ---
-argument-hint: [ui-view-description,prd]
+argument-hint: [ui-view-description, prd]
 description: Extract user stories
 model: claude-haiku-4-5-20251001
 ---

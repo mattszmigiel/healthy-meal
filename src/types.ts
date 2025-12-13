@@ -224,3 +224,139 @@ export interface NoPreferencesErrorResponse {
   message: string;
   action: string;
 }
+
+// ============================================================================
+// RECIPE DETAIL VIEW TYPES
+// ============================================================================
+
+/**
+ * View model aggregating all data needed for recipe detail view
+ */
+export interface RecipeDetailViewModel {
+  recipe: RecipeResponseDTO;
+  variants: RecipeResponseDTO[]; // AI-modified versions (empty if current is AI recipe or no ai-modified versions)
+}
+
+/**
+ * State for AI preview generation with discriminated union
+ */
+export type AIPreviewState =
+  | { status: "idle" }
+  | { status: "loading" }
+  | { status: "success"; data: AIPreviewResponseDTO }
+  | { status: "error"; error: AIPreviewError };
+
+/**
+ * Detailed error types for AI preview
+ */
+export type AIPreviewError =
+  | { type: "no_preferences" }
+  | { type: "rate_limit"; retryAfter: number }
+  | { type: "not_found" }
+  | { type: "service_unavailable" }
+  | { type: "unknown"; message: string };
+
+/**
+ * State for delete confirmation dialog
+ */
+export interface DeleteDialogState {
+  isOpen: boolean;
+  isDeleting: boolean;
+  error: string | null;
+}
+
+/**
+ * Command for saving AI-modified recipe
+ */
+export interface SaveAIRecipeCommand {
+  title: string;
+  ingredients: string;
+  instructions: string;
+  is_ai_generated: true;
+  parent_recipe_id: string;
+  ai_metadata: AIMetadataInput;
+}
+
+/**
+ * Props for RecipeActionBar component
+ */
+export interface RecipeActionBarProps {
+  isAiGenerated: boolean;
+  onModifyWithAI: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
+}
+
+/**
+ * Props for AIIndicator component
+ */
+export interface AIIndicatorProps {
+  parentRecipeId: string;
+  parentRecipeTitle?: string;
+}
+
+/**
+ * Props for AIVariantsList component
+ */
+export interface AIVariantsListProps {
+  variants: RecipeResponseDTO[];
+}
+
+/**
+ * Props for VariantCard component
+ */
+export interface VariantCardProps {
+  variant: RecipeResponseDTO;
+}
+
+/**
+ * Props for CompareView component
+ */
+export interface CompareViewProps {
+  parentRecipeId: string;
+  modified: RecipeEntity;
+}
+
+/**
+ * Props for AIPreviewDialog component
+ */
+export interface AIPreviewDialogProps {
+  isOpen: boolean;
+  recipeId: string;
+  onClose: () => void;
+  onSaved: (newRecipeId: string) => void;
+}
+
+/**
+ * Props for NoPreferencesAlert component
+ */
+export interface NoPreferencesAlertProps {
+  onNavigateToProfile: () => void;
+}
+
+/**
+ * Props for DeleteConfirmDialog component
+ */
+export interface DeleteConfirmDialogProps {
+  isOpen: boolean;
+  isDeleting: boolean;
+  error: string | null;
+  recipeTitle: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+}
+
+/**
+ * Props for RecipeContent component
+ */
+export interface RecipeContentProps {
+  recipe: RecipeResponseDTO;
+}
+
+/**
+ * Props for RecipeDetailView component
+ */
+export interface RecipeDetailViewProps {
+  initialRecipe: RecipeResponseDTO;
+  recipeId: string;
+}
