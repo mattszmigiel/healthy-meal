@@ -1,0 +1,56 @@
+### 2.10 AI Preview Modal (AI Recipe Modification)
+
+- **View name**: AI Preview Modal
+- **Path**: Overlay triggered from `/recipes/[id]`
+- **Main purpose**:
+  - Allow users to generate, inspect, and optionally save AI-modified versions of a recipe, based on their dietary preferences.
+- **Key information to display**:
+  - While loading:
+    - "Generating modifications…" message.
+  - On success:
+    - Modified recipe title (editable).
+    - Modified ingredients.
+    - Modified instructions.
+    - Explanation section:
+      - Key changes (e.g., substitutions and reasons).
+      - Note that the AI used user's saved preferences (diet type, allergies, dislikes).
+  - On errors or missing preferences:
+    - Clear user-friendly messages and guidance.
+- **Key view components**:
+  - **Dialog container**:
+    - Header: "AI Modified Recipe" + close button.
+    - Scrollable body.
+    - Sticky footer.
+  - **Body content**:
+    - Editable title input.
+    - Ingredients (read-only text area).
+    - Instructions.
+    - Explanation card in a muted style.
+  - **Footer**:
+    - Primary button: "Save as New Recipe".
+    - Secondary: "Cancel".
+  - **Loading overlay**:
+    - Overlay with spinner and multi-stage message ("Generating modifications…").
+    - "Cancel" button to abort request.
+  - **Missing preferences state**:
+    - Message: "Set your dietary preferences to use AI modifications".
+    - Visual hint about types of preferences.
+    - Button: "Go to Profile" → `/profile`.
+  - **Error state**:
+    - Short explanation (e.g., "The AI service is temporarily unavailable. Please try again later.").
+    - Retry button for retriable cases.
+- **UX, accessibility, and security considerations**:
+  - Uses `role="dialog"` with `aria-modal="true"`, labelled by header.
+  - Focus trap inside modal; focus returns to "Modify with AI" button on close.
+  - Loading state should be cancelable to avoid user feeling locked.
+  - For rate limits (429), show countdown or instruction not to retry immediately.
+  - Do not show raw AI `raw_response` to user; keep explanation human-readable only.
+- **API alignment**:
+  - Triggers `POST /api/recipes/:id/ai-preview`.
+  - On "Save as New Recipe", uses `POST /api/recipes` with:
+    - `is_ai_generated: true`.
+    - `parent_recipe_id`.
+    - `ai_metadata` from preview.
+- **Related requirements**:
+  - FR-018–FR-025
+  - US-017, US-018, US-019, US-020, US-021

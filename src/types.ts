@@ -360,3 +360,108 @@ export interface RecipeDetailViewProps {
   initialRecipe: RecipeResponseDTO;
   recipeId: string;
 }
+
+// ============================================================================
+// RECIPE LIST VIEW TYPES
+// ============================================================================
+
+/**
+ * View type for recipe list - determines which recipes to show
+ */
+export type ViewType = "my-recipes" | "ai-modified";
+
+/**
+ * Error types for recipe list operations
+ */
+export type RecipeListError =
+  | { type: "network"; message: string }
+  | { type: "session_timeout"; message: string }
+  | { type: "server_error"; message: string }
+  | { type: "unknown"; message: string };
+
+/**
+ * View model for Recipe List view state
+ */
+export interface RecipeListViewModel {
+  recipes: RecipeWithAIMetadataDTO[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    total_pages: number;
+  };
+  currentView: ViewType;
+  isLoading: boolean;
+  error: RecipeListError | null;
+  hasPreferences: boolean;
+}
+
+/**
+ * Props for RecipeListView component
+ */
+export interface RecipeListViewProps {
+  initialRecipes: RecipeListResponseDTO;
+  hasPreferences: boolean;
+}
+
+/**
+ * Props for GlobalNavigation component
+ */
+export interface GlobalNavigationProps {
+  userEmail?: string;
+}
+
+/**
+ * Props for ViewToggle component
+ */
+export interface ViewToggleProps {
+  currentView: ViewType;
+  onChange: (view: ViewType) => void;
+}
+
+/**
+ * Props for RecipeGrid component
+ */
+export interface RecipeGridProps {
+  recipes: RecipeWithAIMetadataDTO[];
+  isLoading: boolean;
+  currentView: ViewType;
+}
+
+/**
+ * Props for RecipeCard component
+ */
+export interface RecipeCardProps {
+  recipe: RecipeWithAIMetadataDTO;
+  showAIBadge: boolean;
+}
+
+/**
+ * Props for PaginationControls component
+ */
+export interface PaginationControlsProps {
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    total_pages: number;
+  };
+  isLoading: boolean;
+  onLoadMore: () => void;
+}
+
+/**
+ * Props for EmptyState component
+ */
+export interface EmptyStateProps {
+  view: ViewType;
+  onAddRecipe: () => void;
+}
+
+/**
+ * Props for OnboardingBanner component
+ */
+export interface OnboardingBannerProps {
+  onNavigateToProfile: () => void;
+  onDismiss: () => void;
+}

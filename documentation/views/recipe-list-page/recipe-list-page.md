@@ -1,0 +1,61 @@
+### 2.5 Recipe List Page
+
+- **View name**: Recipe List
+- **Path**: `/recipes`
+- **Main purpose**:
+  - Main authenticated home.
+  - Display user's recipe library and entry point to creation and AI workflows.
+- **Key information to display**:
+  - User's recipes, segmented:
+    - "My Recipes" (originals by default).
+    - "AI Modified" (AI-generated).
+  - Recipe metadata:
+    - Title (truncated).
+    - Creation date
+    - Badges for AI-modified recipes and parent recipe name (in AI view).
+  - Pagination info ("Showing 1–20 of 45 recipes").
+  - Empty state messaging when no recipes.
+  - Onboarding banner if no dietary preferences yet.
+- **Key view components**:
+  - **Global navigation header** (for all authenticated views):
+    - Logo → `/recipes`.
+    - Nav links: "Recipes", "Profile".
+    - User menu dropdown (email, Logout).
+  - **View toggle**:
+    - Segmented control / tabs: "My Recipes" / "AI Modified".
+    - Controlled by `?view=my-recipes | ai-modified` URL parameter.
+  - **Recipe grid**:
+    - Cards, responsive: 1 col (mobile), 2 (md), 3 (lg).
+    - Card elements:
+      - Title.
+      - Creation date.
+      - Badge "AI Modified" + parent recipe title (for AI recipes).
+      - Entire card clickable → detail.
+  - **Pagination**:
+    - "Load More" button.
+    - Total & range display.
+  - **Actions / CTAs**:
+    - "Add Recipe" button in header or page top.
+  - **Empty state**:
+    - Illustration/placeholder.
+    - Heading: "No recipes yet".
+    - Subtext & primary CTA: "Add Your First Recipe".
+    - Tip about setting dietary preferences to get better AI modifications.
+  - **Onboarding banner**:
+    - Visible if user has no preferences set (or minimal).
+    - Message + "Set dietary preferences" button → `/profile`.
+    - Dismissible until preferences are set.
+  - **Loading states**:
+    - Skeleton cards while fetching.
+- **UX, accessibility, and security considerations**:
+  - Main section labelled appropriately (`<main>` with `h1` "My Recipes").
+  - Segmented control uses proper tab semantics; ensures arrow-key navigation.
+  - Skeletons maintain layout to minimize visual shift.
+  - Recipe data strictly from `/api/recipes` filtered by authenticated user; no shared content.
+  - "Load More" button uses clear loading state; screen reader announcement when new items appear (aria-live).
+- **API alignment**:
+  - `GET /api/recipes?page=1&limit=20&is_ai_generated=false` for "My Recipes".
+  - `GET /api/recipes?...&is_ai_generated=true` for "AI Modified".
+- **Related requirements**:
+  - FR-010, FR-011, FR-012, FR-026–FR-028, FR-029–FR-031
+  - US-005, US-010, US-011, US-022, US-024, US-025
