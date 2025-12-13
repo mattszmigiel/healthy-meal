@@ -1,0 +1,59 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { RecipeListView } from "@/components/recipes/RecipeListView";
+import type { RecipeListResponseDTO } from "@/types";
+
+// Disable prerendering since this is a dynamic page
+export const prerender = false;
+
+// Fetch initial recipes via API (SSR)
+let initialRecipes: RecipeListResponseDTO | null = null;
+let hasPreferences = false;
+let fetchError: string | null = null;
+
+try {
+  // Fetch first page of user's original recipes (not AI-generated)
+  const recipesResponse = await fetch(`${Astro.url.origin}/api/recipes?page=1&limit=20&is_ai_generated=false`);
+
+  if (!recipesResponse.ok) {
+    throw new Error("Failed to fetch recipes");
+  }
+
+  initialRecipes = await recipesResponse.json();
+
+  // Check if user has dietary preferences
+  const preferencesResponse = await fetch(`${Astro.url.origin}/api/profile/dietary-preferences`);
+
+  if (preferencesResponse.ok) {
+    await preferencesResponse.json();
+    hasPreferences = true;
+  } else if (preferencesResponse.status === 404) {
+    // User doesn't have preferences yet - that's okay
+    hasPreferences = false;
+  }
+} catch (error) {
+  console.error("Error fetching data for SSR:", error);
+  fetchError = "Failed to load recipes";
+}
+---
+
+<Layout title="My Recipes">
+  {
+    fetchError || !initialRecipes ? (
+      <div class="max-w-4xl mx-auto px-4 py-8">
+        <div class="rounded-lg border border-destructive bg-destructive/10 p-6 text-center">
+          <h1 class="text-2xl font-bold text-destructive mb-2">Error Loading Recipes</h1>
+          <p class="text-muted-foreground mb-4">{fetchError || "Unable to load recipes"}</p>
+          <a
+            href="/"
+            class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-primary text-primary-foreground hover:bg-primary/90 h-10 py-2 px-4"
+          >
+            Go Home
+          </a>
+        </div>
+      </div>
+    ) : (
+      <RecipeListView client:load initialRecipes={initialRecipes} hasPreferences={hasPreferences} />
+    )
+  }
+</Layout>

@@ -29,7 +29,7 @@ Review the defined types:
 Implement the plan according to the following approach:
 
 <implementation_approach>
-Implement a maximum of 3 steps (tasks) from the implementation plan, briefly summarize what you've done, and describe the plan for the next 3 actions - stop work at this point and wait for my feedback.
+Implement a maximum of 3 steps (tasks) from the implementation plan, run linter and fix liter errors, then briefly summarize what you've done, and describe the plan for the next 3 actions - stop work at this point and wait for my feedback.
 </implementation_approach>
 
 Carefully analyze the implementation plan and rules. Pay special attention to component structure, API integration requirements, and user interactions described in the plan.
