@@ -119,47 +119,41 @@ export function RecipeDetailView({ initialRecipe, recipeId }: RecipeDetailViewPr
   }
 
   return (
-    <>
-      {/* Action Bar - Outside container for proper sticky behavior */}
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
-        <div className="max-w-4xl mx-auto px-4">
-          <RecipeActionBar
-            isAiGenerated={recipe.is_ai_generated}
-            onModifyWithAI={handleModifyWithAI}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
-        </div>
-      </div>
+    <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="space-y-6">
+        {/* Breadcrumb Navigation */}
+        <nav aria-label="Breadcrumb" className="text-sm text-muted-foreground">
+          <ol className="flex items-center gap-2">
+            <li>
+              <a href="/recipes" className="hover:text-foreground transition-colors">
+                Recipes
+              </a>
+            </li>
+            <li aria-hidden="true">/</li>
+            <li aria-current="page" className="text-foreground font-medium truncate">
+              {recipe.title}
+            </li>
+          </ol>
+        </nav>
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="space-y-6">
-          {/* Breadcrumb Navigation */}
-          <nav aria-label="Breadcrumb" className="text-sm text-muted-foreground">
-            <ol className="flex items-center gap-2">
-              <li>
-                <a href="/recipes" className="hover:text-foreground transition-colors">
-                  Recipes
-                </a>
-              </li>
-              <li aria-hidden="true">/</li>
-              <li aria-current="page" className="text-foreground font-medium truncate">
-                {recipe.title}
-              </li>
-            </ol>
-          </nav>
+        {/* Action Bar */}
+        <RecipeActionBar
+          isAiGenerated={recipe.is_ai_generated}
+          onModifyWithAI={handleModifyWithAI}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
 
-          {/* Recipe Content */}
-          <RecipeContent recipe={recipe} />
+        {/* Recipe Content */}
+        <RecipeContent recipe={recipe} />
 
-          {/* AI Variants List - Only for original recipes with variants */}
-          {!recipe.is_ai_generated && variants.length > 0 && <AIVariantsList variants={variants} />}
+        {/* AI Variants List - Only for original recipes with variants */}
+        {!recipe.is_ai_generated && variants.length > 0 && <AIVariantsList variants={variants} />}
 
-          {/* Compare View - Only for AI-generated recipes */}
-          {recipe.is_ai_generated && recipe.parent_recipe_id && (
-            <CompareView parentRecipeId={recipe.parent_recipe_id} modified={recipe} />
-          )}
-        </div>
+        {/* Compare View - Only for AI-generated recipes */}
+        {recipe.is_ai_generated && recipe.parent_recipe_id && (
+          <CompareView parentRecipeId={recipe.parent_recipe_id} modified={recipe} />
+        )}
       </div>
 
       {/* AI Preview Dialog */}
@@ -179,6 +173,6 @@ export function RecipeDetailView({ initialRecipe, recipeId }: RecipeDetailViewPr
         onConfirm={confirmDelete}
         onCancel={closeDeleteDialog}
       />
-    </>
+    </div>
   );
 }
