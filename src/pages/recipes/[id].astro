@@ -2,8 +2,7 @@
 import { z } from "zod";
 import Layout from "@/layouts/Layout.astro";
 import { RecipeDetailView } from "@/components/recipes/RecipeDetailView";
-import { RecipeService } from "@/lib/services/recipe.service";
-import type { RecipeResponseDTO } from "@/types";
+import type { RecipeResponseDTO, APIErrorResponse } from "@/types";
 
 // Disable prerendering since this is a dynamic page
 export const prerender = false;
@@ -24,18 +23,35 @@ if (!validation.success) {
   return Astro.redirect("/404");
 }
 
-// Fetch recipe server-side
+// Fetch recipe server-side via API
 let recipe: RecipeResponseDTO | null = null;
 let fetchError: string | null = null;
 
 try {
-  const supabase = Astro.locals.supabase;
-  const service = new RecipeService(supabase);
-  recipe = await service.getRecipeById(validation.data.id);
+  // Construct API URL for server-side fetch
+  const apiUrl = `${Astro.url.origin}/api/recipes/${validation.data.id}`;
+
+  // Fetch recipe from API endpoint
+  const response = await fetch(apiUrl, {
+    method: "GET",
+    headers: {
+      // Forward cookies for authentication
+      Cookie: Astro.request.headers.get("Cookie") || "",
+    },
+  });
 
   // Handle not found (404)
-  if (!recipe) {
+  if (response.status === 404) {
     return Astro.redirect("/404");
+  }
+
+  // Handle other non-ok responses
+  if (!response.ok) {
+    const errorData: APIErrorResponse = await response.json();
+    console.error("API error fetching recipe:", errorData);
+    fetchError = errorData.message || "Failed to load recipe";
+  } else {
+    recipe = await response.json();
   }
 } catch (error) {
   console.error("Error fetching recipe for SSR:", error);
