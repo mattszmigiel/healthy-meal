@@ -807,21 +807,6 @@ try {
 
 ---
 
-### 8.7 Logout
-
-**User Action:** Click "Logout" in user menu dropdown
-
-**Flow:**
-1. User opens user menu dropdown
-2. User clicks "Logout"
-3. Call logout endpoint/Supabase auth
-4. Clear session/cookies
-5. Redirect to `/login`
-
-**Expected Outcome:** User is logged out and redirected to login page
-
----
-
 ## 9. Conditions and Validation
 
 ### 9.1 API-Level Validations
@@ -872,18 +857,6 @@ The API validates query parameters using Zod schema:
 - **Condition:** Different messaging per view type
 - **Validation:** Check `view === 'my-recipes'` vs `view === 'ai-modified'`
 - **Impact:** Contextual empty state guidance
-
----
-
-### 9.3 Authentication & Authorization
-
-**Condition:** User must be authenticated to access page
-**Validation:** Handled by Astro middleware, checks session
-**Impact:** Redirect to `/login?returnUrl=/recipes` if not authenticated
-
-**Condition:** Users only see their own recipes
-**Validation:** API filters by authenticated user ID
-**Impact:** No action needed at component level, API enforces isolation
 
 ---
 
@@ -1242,89 +1215,6 @@ npx shadcn@latest add dropdown-menu
 
 ---
 
-### Step 15: Test View Toggle and URL Sync
-
-**Task:** Verify view switching functionality
-
-**Tests:**
-- Click "My Recipes" → URL updates, API called, recipes update
-- Click "AI Modified" → URL updates, API called, recipes update
-- Direct navigation to `?view=ai-modified` → correct view selected
-- Browser back/forward → view updates correctly
-
-**Verification:** All scenarios work, no race conditions
-
----
-
-### Step 16: Test Pagination
-
-**Task:** Verify load more functionality
-
-**Tests:**
-- Click "Load More" → next page fetched, recipes appended
-- Last page → "Load More" button hidden/disabled
-- Error during load more → error shown, retry works
-- Switch view → pagination resets
-
-**Verification:** Pagination works correctly in all scenarios
-
----
-
-### Step 17: Test Empty States
-
-**Task:** Verify empty state displays
-
-**Tests:**
-- No recipes in "My Recipes" → correct empty state
-- No AI recipes in "AI Modified" → correct empty state
-- CTA button navigates to create recipe
-
-**Verification:** Empty states show correct messaging
-
----
-
-### Step 18: Test Onboarding Banner
-
-**Task:** Verify banner behavior
-
-**Tests:**
-- No preferences → banner shows
-- Dismiss banner → banner hides, localStorage set
-- Reload page → banner stays hidden
-- Set preferences → banner no longer shows (requires preference check)
-
-**Verification:** Banner persistence works correctly
-
----
-
-### Step 19: Test Error Scenarios
-
-**Task:** Verify error handling
-
-**Tests:**
-- Network error → error message, retry works
-- Session timeout → redirect to login with returnUrl
-- Server error → friendly message, retry works
-- Invalid parameters → graceful degradation
-
-**Verification:** All errors handled gracefully
-
----
-
-### Step 20: Test Responsive Design
-
-**Task:** Verify mobile, tablet, desktop layouts
-
-**Tests:**
-- Mobile (< 768px) → 1 column grid, navigation works
-- Tablet (768-1024px) → 2 column grid
-- Desktop (> 1024px) → 3 column grid
-- All elements accessible and usable on all sizes
-
-**Verification:** Layout adapts correctly to all screen sizes
-
----
-
 ### Step 21: Accessibility Audit
 
 **Task:** Verify WCAG compliance
@@ -1357,21 +1247,6 @@ npx shadcn@latest add dropdown-menu
 
 ---
 
-### Step 23: Integration Testing
-
-**Task:** Test complete user flows
-
-**Flows:**
-1. Login → lands on /recipes → sees My Recipes → creates recipe → sees in list
-2. Toggle to AI Modified → sees empty state → creates AI recipe from detail → sees in AI list
-3. Load more recipes → paginate through multiple pages
-4. Dismiss banner → refresh → banner stays dismissed
-5. Session expires → redirected to login → logs back in → returns to recipes
-
-**Verification:** All user flows complete successfully
-
----
-
 ### Step 24: Code Review and Cleanup
 
 **Task:** Review code quality
@@ -1380,24 +1255,10 @@ npx shadcn@latest add dropdown-menu
 - Remove console.logs (except intentional error logging)
 - Ensure consistent code formatting (Prettier)
 - Fix ESLint warnings
-- Add JSDoc comments to complex functions
 - Verify all types are properly defined
 - Check for unused imports
 
 **Verification:** Linter passes, code is clean
-
----
-
-### Step 25: Documentation
-
-**Task:** Update project documentation
-
-**Documents:**
-- Add component usage examples to CLAUDE.md if needed
-- Document any new patterns or conventions
-- Update README if user-facing changes
-
-**Verification:** Documentation is accurate and helpful
 
 ---
 

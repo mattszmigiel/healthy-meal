@@ -22,10 +22,13 @@ export function RecipeContent({ recipe }: RecipeContentProps) {
   const updatedDate = formatDate(recipe.updated_at);
   const showUpdatedDate = recipe.created_at !== recipe.updated_at;
 
+  // Truncate very long titles
+  const displayTitle = recipe.title.length > 40 ? `${recipe.title.substring(0, 40)}...` : recipe.title;
+
   return (
     <div className="space-y-6">
       {/* Title */}
-      <h1 className="text-4xl font-bold tracking-tight">{recipe.title}</h1>
+      <h1 className="text-4xl font-bold tracking-tight">{displayTitle}</h1>
 
       {/* Metadata */}
       <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">

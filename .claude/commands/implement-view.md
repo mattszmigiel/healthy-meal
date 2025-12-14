@@ -1,6 +1,6 @@
 ---
 argument-hint: [implementation-plan, frontend-rules, shadcn-helper, types]
-description: Create a plan for rest API
+description: Implement UI view
 model: claude-sonnet-4-5-20250929
 ---
 
