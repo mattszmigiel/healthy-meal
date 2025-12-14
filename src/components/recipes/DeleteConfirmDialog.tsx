@@ -46,6 +46,9 @@ export function DeleteConfirmDialog({
   onConfirm,
   onCancel,
 }: DeleteConfirmDialogProps) {
+  // Truncate very long titles in the dialog
+  const displayTitle = recipeTitle.length > 30 ? `${recipeTitle.substring(0, 30)}...` : recipeTitle;
+
   return (
     <AlertDialog open={isOpen} onOpenChange={(open) => !open && !isDeleting && onCancel()}>
       <AlertDialogContent>
@@ -56,7 +59,7 @@ export function DeleteConfirmDialog({
           </AlertDialogTitle>
           <AlertDialogDescription className="space-y-3">
             <p>Are you sure you want to delete this recipe?</p>
-            <p className="font-semibold text-foreground">&quot;{recipeTitle}&quot;</p>
+            <p className="font-semibold text-foreground break-words">&quot;{displayTitle}&quot;</p>
             <p className="text-destructive">This action cannot be undone.</p>
           </AlertDialogDescription>
         </AlertDialogHeader>

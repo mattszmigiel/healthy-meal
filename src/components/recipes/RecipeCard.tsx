@@ -13,8 +13,8 @@ export function RecipeCard({ recipe, showAIBadge }: RecipeCardProps) {
     day: "numeric",
   }).format(new Date(recipe.created_at));
 
-  // Truncate title if too long
-  const displayTitle = recipe.title.length > 60 ? `${recipe.title.substring(0, 60)}...` : recipe.title;
+  // Truncate title to 30 characters
+  const displayTitle = recipe.title.length > 30 ? `${recipe.title.substring(0, 30)}...` : recipe.title;
 
   return (
     <a
