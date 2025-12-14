@@ -58,7 +58,8 @@ Important:
 - Maintain the essence and appeal of the original dish
 - Provide clear explanations for all changes
 - Ensure the modified recipe is complete and ready to use
-- If multiple dietary preferences apply, address all of them`;
+- If multiple dietary preferences apply, address all of them
+- Always respond in the language of the original recipe - do not translate it.`;
 }
 
 /**
