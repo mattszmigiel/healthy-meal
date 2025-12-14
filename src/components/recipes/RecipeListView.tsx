@@ -35,6 +35,11 @@ export function RecipeListView({ initialRecipes, hasPreferences }: RecipeListVie
     switchView(currentView);
   };
 
+  // Handle add recipe navigation
+  const handleAddRecipe = () => {
+    navigate("/recipes/new");
+  };
+
   return (
     <main className="container mx-auto px-4 py-8">
       {/* Screen reader title */}
@@ -47,9 +52,22 @@ export function RecipeListView({ initialRecipes, hasPreferences }: RecipeListVie
         </div>
       )}
 
-      {/* View Toggle */}
-      <div className="mb-6">
+      {/* Header with View Toggle and Add Recipe button */}
+      <div className="flex items-center justify-between mb-6">
         <ViewToggle currentView={currentView} onChange={switchView} />
+        <Button onClick={handleAddRecipe}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="w-4 h-4"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+          Add Recipe
+        </Button>
       </div>
 
       {/* Error Display */}

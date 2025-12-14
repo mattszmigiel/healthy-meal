@@ -9,8 +9,10 @@ import type {
   AppliedDietaryPreferences,
   AIMetadataInput,
 } from "@/types";
-import { generateMockedAIPreview } from "./mocked-ai.service";
+import { OpenRouterService } from "./openrouter/openrouter.service";
+import { OpenRouterError, type ChatResponse } from "./openrouter/openrouter.types";
 import { logger, getErrorStack } from "@/lib/utils/logger";
+import { buildRecipeModificationPrompt, RECIPE_MODIFICATION_SYSTEM_PROMPT } from "./ai-preview.prompt";
 
 type SupabaseClient = typeof supabaseClient;
 
@@ -28,7 +30,18 @@ export const AI_PREVIEW_ERRORS = {
  * Service for generating AI recipe previews
  */
 export class AIPreviewService {
-  constructor(private supabase: SupabaseClient) {}
+  private openRouterService: OpenRouterService;
+
+  constructor(
+    private supabase: SupabaseClient,
+    openRouterApiKey: string
+  ) {
+    this.openRouterService = new OpenRouterService({
+      apiKey: openRouterApiKey,
+      timeout: 120000,
+      maxRetries: 2,
+    });
+  }
 
   /**
    * Generates an AI preview of a modified recipe based on user's dietary preferences
@@ -55,29 +68,59 @@ export class AIPreviewService {
       throw new Error(AI_PREVIEW_ERRORS.NO_PREFERENCES);
     }
 
-    // Call mocked AI service to generate modified recipe
+    // Call OpenRouter AI service to generate modified recipe
     let aiResponse;
+    const startTime = Date.now();
     try {
-      aiResponse = await generateMockedAIPreview(recipe, preferences);
-    } catch (error) {
-      logger.error("AI service call failed", {
-        user_id: userId,
-        recipe_id: recipeId,
-        error_stack: getErrorStack(error),
+      const prompt = buildRecipeModificationPrompt(recipe, preferences);
+      const chatResponse = await this.openRouterService.chat({
+        messages: [
+          {
+            role: "system",
+            content: RECIPE_MODIFICATION_SYSTEM_PROMPT,
+          },
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+        responseFormat: {
+          type: "json_object",
+        },
+        parameters: {
+          temperature: 0.7,
+          maxTokens: 4000,
+        },
       });
+
+      const generationDuration = Date.now() - startTime;
+      aiResponse = this.parseAIResponse(chatResponse, generationDuration);
+    } catch (error) {
+      const generationDuration = Date.now() - startTime;
+
+      // Handle specific OpenRouter errors
+      if (error instanceof OpenRouterError) {
+        logger.error("OpenRouter API call failed", {
+          user_id: userId,
+          recipe_id: recipeId,
+          error_type: error.errorType,
+          status_code: error.statusCode,
+          error_message: error.message,
+          generation_duration: generationDuration,
+        });
+      } else {
+        logger.error("AI service call failed", {
+          user_id: userId,
+          recipe_id: recipeId,
+          error_stack: getErrorStack(error),
+          generation_duration: generationDuration,
+        });
+      }
       throw new Error(AI_PREVIEW_ERRORS.AI_SERVICE_ERROR);
     }
 
     // Format and return response
-    return this.formatPreviewResponse(
-      recipe,
-      aiResponse.modifiedRecipe,
-      {
-        ...aiResponse.metadata,
-        raw_response: aiResponse.metadata.raw_response as unknown as Json,
-      },
-      preferences
-    );
+    return this.formatPreviewResponse(recipe, aiResponse.modifiedRecipe, aiResponse.metadata, preferences);
   }
 
   /**
@@ -155,6 +198,83 @@ export class AIPreviewService {
 
     // All preferences are null or empty
     return false;
+  }
+
+  /**
+   * Parses the AI response and extracts the modified recipe
+   *
+   * @param chatResponse - Response from OpenRouter API
+   * @param generationDuration - Time taken to generate the response
+   * @returns Parsed AI response with modified recipe and metadata
+   */
+  private parseAIResponse(
+    chatResponse: ChatResponse,
+    generationDuration: number
+  ): {
+    modifiedRecipe: {
+      title: string;
+      ingredients: string;
+      instructions: string;
+      explanation: string;
+    };
+    metadata: {
+      model: string;
+      provider: string;
+      generation_duration: number;
+      raw_response: Json;
+    };
+  } {
+    // Extract the content from the first choice
+    const content = chatResponse.choices[0]?.message?.content;
+    if (!content) {
+      throw new Error("No content in AI response");
+    }
+
+    // Parse the JSON response
+    let modifiedRecipe;
+    try {
+      modifiedRecipe = JSON.parse(content);
+    } catch (error) {
+      logger.error("Failed to parse AI response as JSON", {
+        content,
+        error_stack: getErrorStack(error),
+      });
+      throw new Error("Invalid JSON response from AI");
+    }
+
+    // Validate required fields
+    if (
+      !modifiedRecipe.title ||
+      !modifiedRecipe.ingredients ||
+      !modifiedRecipe.instructions ||
+      !modifiedRecipe.explanation
+    ) {
+      throw new Error("AI response missing required fields");
+    }
+
+    // Handle array format for ingredients and instructions
+    const ingredients = Array.isArray(modifiedRecipe.ingredients)
+      ? modifiedRecipe.ingredients.join("\n")
+      : modifiedRecipe.ingredients;
+
+    const instructions = Array.isArray(modifiedRecipe.instructions)
+      ? modifiedRecipe.instructions.join("\n")
+      : modifiedRecipe.instructions;
+
+    return {
+      modifiedRecipe: {
+        title: modifiedRecipe.title,
+        ingredients,
+        instructions,
+        explanation: modifiedRecipe.explanation,
+      },
+      metadata: {
+        model: chatResponse.model,
+        provider: "openrouter",
+        generation_duration: generationDuration,
+        raw_response: chatResponse as unknown as Json,
+      },
+    };
   }
 
   /**

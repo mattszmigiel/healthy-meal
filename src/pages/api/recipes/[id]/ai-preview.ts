@@ -63,7 +63,15 @@ export const POST: APIRoute = async ({ params, locals }) => {
     }
 
     // Step 4: Call service layer to generate AI preview
-    const service = new AIPreviewService(locals.supabase);
+    const openRouterApiKey = import.meta.env.OPENROUTER_API_KEY;
+    if (!openRouterApiKey) {
+      logger.error("OpenRouter API key not configured", {
+        user_id: userId,
+      });
+      return serviceUnavailableResponse();
+    }
+
+    const service = new AIPreviewService(locals.supabase, openRouterApiKey);
     const preview = await service.generateAIPreview(recipeId, userId);
 
     // Step 5: Return success response
