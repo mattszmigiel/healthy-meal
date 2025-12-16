@@ -409,6 +409,58 @@ export interface RecipeListViewProps {
  */
 export interface GlobalNavigationProps {
   userEmail?: string;
+  currentPath: string;
+}
+
+/**
+ * Props for DesktopNavigation component
+ */
+export interface DesktopNavigationProps {
+  userEmail?: string;
+  currentPath: string;
+}
+
+/**
+ * Props for MobileNavigation component
+ */
+export interface MobileNavigationProps {
+  userEmail?: string;
+  currentPath: string;
+}
+
+/**
+ * Props for UserMenu component (desktop dropdown)
+ */
+export interface UserMenuProps {
+  userEmail?: string;
+  onLogout: () => void;
+}
+
+/**
+ * Props for MobileMenu component (slide-out panel)
+ */
+export interface MobileMenuProps {
+  isOpen: boolean;
+  onClose: () => void;
+  userEmail?: string;
+  currentPath: string;
+  onLogout: () => void;
+}
+
+/**
+ * Props for NavLinks component
+ */
+export interface NavLinksProps {
+  currentPath: string;
+  orientation?: "horizontal" | "vertical";
+  onLinkClick?: () => void;
+}
+
+/**
+ * State for mobile menu
+ */
+export interface MobileMenuState {
+  isOpen: boolean;
 }
 
 /**
