@@ -27,9 +27,9 @@ export function useDietaryPreferences(initialPreferences: DietaryPreferencesDTO 
 
     return (
       formState.diet_type !== preferences.diet_type ||
-      JSON.stringify(formState.allergies.sort()) !== JSON.stringify((preferences.allergies || []).sort()) ||
-      JSON.stringify(formState.disliked_ingredients.sort()) !==
-        JSON.stringify((preferences.disliked_ingredients || []).sort())
+      JSON.stringify([...formState.allergies].sort()) !== JSON.stringify([...(preferences.allergies || [])].sort()) ||
+      JSON.stringify([...formState.disliked_ingredients].sort()) !==
+        JSON.stringify([...(preferences.disliked_ingredients || [])].sort())
     );
   }, [formState, preferences]);
 
