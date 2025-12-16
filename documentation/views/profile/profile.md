@@ -1,0 +1,49 @@
+### 2.9 Profile & Dietary Preferences Page
+
+- **View name**: Profile
+- **Path**: `/profile`
+- **Main purpose**:
+  - Allow users to review account info and configure dietary preferences that drive AI modifications.
+- **Key information to display**:
+  - Account section:
+    - User email (read-only).
+  - Dietary preferences section:
+    - Diet type (e.g., omnivore, vegetarian, vegan, etc.).
+    - Allergies/intolerances (array of strings).
+    - Disliked ingredients (array of strings).
+    - (Religious restrictions / nutritional goals can be integrated later as backend supports).
+- **Key view components**:
+  - Layout:
+    - Single column on mobile; two columns on large screens (Account / Preferences).
+  - Account panel:
+    - Email display.
+    - "Logout" button (also in header menu).
+  - Dietary Preferences panel:
+    - Default read-only view.
+    - "Edit" button to toggle edit mode.
+    - In edit mode:
+      - Diet Type dropdown (Select) with allowed values:
+        - omnivore, vegetarian, vegan, pescatarian, keto, paleo, low_carb, low_fat, mediterranean, other, plus "Not specified".
+      - Allergies:
+        - Tag input component (type + Enter to add).
+      - Disliked ingredients:
+        - Tag input component.
+      - "Save" and "Cancel" buttons.
+- **UX, accessibility, and security considerations**:
+  - Inline edit mode clearly signaled (e.g., border, labels).
+  - Tag input:
+    - Keyboard-friendly: Enter to add, Backspace/Delete to remove.
+    - Announce additions/removals via `aria-live` (polite).
+  - On save:
+    - Disable controls, show spinner in button.
+    - On success, show toast "Preferences updated".
+    - Reload view in read-only state.
+  - On error:
+    - Keep edited values; show error message.
+  - Preferences are private health-related data; never shared or exposed.
+- **API alignment**:
+  - `GET /api/profile/dietary-preferences` on page load.
+  - `PUT /api/profile/dietary-preferences` on Save.
+- **Related requirements**:
+  - FR-006–FR-009, FR-026–FR-028, FR-029–FR-032
+  - US-005, US-006, US-007, US-008, US-009

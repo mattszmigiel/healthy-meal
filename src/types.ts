@@ -516,3 +516,80 @@ export interface OnboardingBannerProps {
   onNavigateToProfile: () => void;
   onDismiss: () => void;
 }
+
+// ============================================================================
+// PROFILE VIEW TYPES
+// ============================================================================
+
+/**
+ * Props for ProfileView component
+ * Contains initial data fetched server-side
+ */
+export interface ProfileViewProps {
+  initialPreferences: DietaryPreferencesDTO | null;
+  userEmail: string;
+}
+
+/**
+ * Props for AccountSection component
+ */
+export interface AccountSectionProps {
+  userEmail: string;
+}
+
+/**
+ * Props for DietaryPreferencesSection component
+ */
+export interface DietaryPreferencesSectionProps {
+  preferences: DietaryPreferencesDTO | null;
+  onPreferencesUpdated: (preferences: DietaryPreferencesDTO) => void;
+}
+
+/**
+ * Props for DietTypeSelect component
+ */
+export interface DietTypeSelectProps {
+  value: DietType | null;
+  onChange: (value: DietType | null) => void;
+  disabled?: boolean;
+  id: string;
+}
+
+/**
+ * Props for TagInput component
+ */
+export interface TagInputProps {
+  label: string;
+  value: string[];
+  onChange: (value: string[]) => void;
+  placeholder?: string;
+  disabled?: boolean;
+  id: string;
+  ariaDescribedBy?: string;
+}
+
+/**
+ * Form state for dietary preferences editing
+ */
+export interface DietaryPreferencesFormState {
+  diet_type: DietType | null;
+  allergies: string[];
+  disliked_ingredients: string[];
+}
+
+/**
+ * Return type for useDietaryPreferences hook
+ */
+export interface UseDietaryPreferencesReturn {
+  preferences: DietaryPreferencesDTO | null;
+  formState: DietaryPreferencesFormState;
+  isEditing: boolean;
+  isSaving: boolean;
+  error: string | null;
+  hasChanges: boolean;
+  startEditing: () => void;
+  cancelEditing: () => void;
+  updateFormField: (field: keyof DietaryPreferencesFormState, value: unknown) => void;
+  savePreferences: () => Promise<void>;
+  resetError: () => void;
+}
