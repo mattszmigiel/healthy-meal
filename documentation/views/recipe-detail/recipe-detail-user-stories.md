@@ -46,23 +46,6 @@
 
 ---
 
-### US-013: Edit Recipe
-**Title:** Edit Recipe
-**Description:** As a user, I want to edit an existing recipe so that I can correct errors or update the content.
-
-**Acceptance Criteria:**
-- User can access edit function from recipe detail view
-- Edit form is pre-populated with current recipe data
-- User can modify recipe title
-- User can modify recipe content
-- User can save changes
-- System validates required fields
-- System updates last modified timestamp
-- User receives confirmation of successful update
-- User can cancel editing and return to recipe detail without saving changes
-
----
-
 ### US-014: Delete Recipe
 **Title:** Delete Recipe
 **Description:** As a user, I want to delete a recipe so that I can remove recipes I no longer need.
