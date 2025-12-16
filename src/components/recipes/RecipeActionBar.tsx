@@ -56,28 +56,6 @@ function SparklesIcon({ className }: { className?: string }) {
 }
 
 /**
- * Pencil/Edit icon SVG component
- */
-function PencilIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden="true"
-    >
-      <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
-      <path d="m15 5 4 4" />
-    </svg>
-  );
-}
-
-/**
  * Trash/Delete icon SVG component
  */
 function TrashIcon({ className }: { className?: string }) {
@@ -104,7 +82,7 @@ function TrashIcon({ className }: { className?: string }) {
  * RecipeActionBar component provides quick access to primary recipe actions
  * Sticky positioning keeps it visible while scrolling
  */
-export function RecipeActionBar({ isAiGenerated, onModifyWithAI, onEdit, onDelete }: RecipeActionBarProps) {
+export function RecipeActionBar({ isAiGenerated, onModifyWithAI, onDelete }: RecipeActionBarProps) {
   return (
     <div className="flex items-center justify-between gap-3 py-4">
       {/* Primary Actions */}
@@ -117,13 +95,6 @@ export function RecipeActionBar({ isAiGenerated, onModifyWithAI, onEdit, onDelet
             <span className="sm:hidden">AI Modify</span>
           </Button>
         )}
-
-        {/* Edit Button */}
-        <Button onClick={onEdit} variant="outline" className="gap-2">
-          <PencilIcon className="h-4 w-4" />
-          <span className="hidden sm:inline">Edit Recipe</span>
-          <span className="sm:hidden">Edit</span>
-        </Button>
       </div>
 
       {/* Overflow Menu */}

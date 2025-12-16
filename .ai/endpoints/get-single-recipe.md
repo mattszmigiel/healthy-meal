@@ -362,7 +362,7 @@ export async function GET(context: APIContext): Promise<Response> {
 ## 10. Additional Notes
 
 ### Service Layer Benefits:
-- **Reusability**: Service can be used by other endpoints (e.g., edit recipe page)
+- **Reusability**: Service can be used by other endpoints
 - **Testability**: Business logic separated from HTTP concerns
 - **Maintainability**: Database query logic in one place
 

@@ -331,41 +331,6 @@ For each view:
 
 ---
 
-### 2.8 Recipe Edit Page
-
-- **View name**: Edit Recipe
-- **Path**: `/recipes/[id]/edit`
-- **Main purpose**:
-  - Allow users to update an existing recipe’s title, ingredients, and instructions.
-- **Key information to display**:
-  - Same fields as create, pre-populated.
-  - Last modified timestamp (optional).
-  - Errors (validation, conflict, network).
-- **Key view components**:
-  - Page heading: “Edit Recipe”.
-  - Form identical to Create page:
-    - Title input with counter.
-    - Ingredients & instructions textareas with combined count.
-  - Buttons:
-    - “Save Changes”.
-    - “Cancel” → back to detail without saving.
-- **UX, accessibility, and security considerations**:
-  - Working copy prefilled from `GET /api/recipes/:id`.
-  - Optimistic-UI optional, but must respect backend optimistic locking:
-    - Include `updated_at` timestamp in the update.
-  - On `409 Conflict` (simultaneous edit):
-    - Show clear, non-technical error message (toast and/or inline).
-    - Optionally reload latest version and inform user their copy was outdated.
-    - User can choose to overwrite or apply changes again.
-  - On validation/network errors:
-    - Preserve user input; show descriptive error messages.
-- **API alignment**:
-  - `PUT /api/recipes/:id` with fields and last known `updated_at` to satisfy optimistic locking.
-- **Related requirements**:
-  - FR-013, FR-028, FR-031–FR-032
-  - US-013, US-023, US-025, US-027
-
----
 
 ### 2.9 Profile & Dietary Preferences Page
 
@@ -718,7 +683,6 @@ On `/`, `/login`, `/register`, `/reset-password`:
   - Click card → Recipe Detail.
   - “Add Recipe” button → Create Recipe page.
 - **From Recipe Detail**:
-  - “Edit” → Edit Recipe page.
   - “Modify with AI” → AI Preview Modal (no route change).
   - Back to list via logo or “Back to recipes” link.
   - From AI-generated recipe: link to parent/original.

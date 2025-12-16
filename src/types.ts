@@ -283,7 +283,6 @@ export interface SaveAIRecipeCommand {
 export interface RecipeActionBarProps {
   isAiGenerated: boolean;
   onModifyWithAI: () => void;
-  onEdit: () => void;
   onDelete: () => void;
 }
 

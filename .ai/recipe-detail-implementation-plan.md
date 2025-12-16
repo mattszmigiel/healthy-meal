@@ -1155,18 +1155,6 @@ try {
 
 ---
 
-### 5. Edit Recipe
-
-**Trigger**: User clicks "Edit" button in RecipeActionBar
-
-**Flow**:
-1. Click event triggers `onEdit`
-2. Navigate to edit page (`/recipes/${recipeId}/edit`)
-
-**Expected Outcome**: User navigated to edit page
-
----
-
 ### 6. Delete Recipe
 
 **Trigger**: User clicks "Delete" in RecipeActionBar overflow menu
