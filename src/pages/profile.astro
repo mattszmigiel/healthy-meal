@@ -1,0 +1,55 @@
+---
+import AuthenticatedLayout from "@/layouts/AuthenticatedLayout.astro";
+import { ProfileView } from "@/components/profile/ProfileView";
+import type { DietaryPreferencesDTO } from "@/types";
+
+// Disable prerendering since this is a dynamic page
+export const prerender = false;
+
+// For now, using a test user email
+// TODO: Replace with actual session extraction logic when authentication is implemented
+const userEmail = "test@example.com";
+
+// Fetch dietary preferences via API (SSR)
+let preferences: DietaryPreferencesDTO | null = null;
+let fetchError: string | null = null;
+
+try {
+  const response = await fetch(`${Astro.url.origin}/api/profile/dietary-preferences`);
+
+  if (response.ok) {
+    preferences = await response.json();
+  } else if (response.status === 404) {
+    // No preferences set yet - this is okay, pass null
+    preferences = null;
+  } else if (response.status === 401) {
+    // Not authenticated - redirect to home/login
+    return Astro.redirect("/");
+  } else {
+    throw new Error("Failed to load preferences");
+  }
+} catch {
+  fetchError = "Failed to load profile data";
+}
+---
+
+<AuthenticatedLayout title="Profile - HealthyMeal">
+  {
+    fetchError ? (
+      <div class="max-w-4xl mx-auto px-4 py-8">
+        <div class="rounded-lg border border-destructive bg-destructive/10 p-6 text-center">
+          <h1 class="text-2xl font-bold text-destructive mb-2">Error Loading Profile</h1>
+          <p class="text-muted-foreground mb-4">{fetchError}</p>
+          <a
+            href="/"
+            class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-primary text-primary-foreground hover:bg-primary/90 h-10 py-2 px-4"
+          >
+            Go Home
+          </a>
+        </div>
+      </div>
+    ) : (
+      <ProfileView client:load initialPreferences={preferences} userEmail={userEmail} />
+    )
+  }
+</AuthenticatedLayout>
