@@ -1,5 +1,5 @@
 ---
-import Layout from "@/layouts/Layout.astro";
+import AuthenticatedLayout from "@/layouts/AuthenticatedLayout.astro";
 import { RecipeListView } from "@/components/recipes/RecipeListView";
 import type { RecipeListResponseDTO } from "@/types";
 
@@ -37,7 +37,7 @@ try {
 }
 ---
 
-<Layout title="My Recipes">
+<AuthenticatedLayout title="My Recipes">
   {
     fetchError || !initialRecipes ? (
       <div class="max-w-4xl mx-auto px-4 py-8">
@@ -56,4 +56,4 @@ try {
       <RecipeListView client:load initialRecipes={initialRecipes} hasPreferences={hasPreferences} />
     )
   }
-</Layout>
+</AuthenticatedLayout>

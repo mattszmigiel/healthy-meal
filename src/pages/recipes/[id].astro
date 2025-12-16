@@ -1,6 +1,6 @@
 ---
 import { z } from "zod";
-import Layout from "@/layouts/Layout.astro";
+import AuthenticatedLayout from "@/layouts/AuthenticatedLayout.astro";
 import { RecipeDetailView } from "@/components/recipes/RecipeDetailView";
 import type { RecipeResponseDTO, APIErrorResponse } from "@/types";
 
@@ -62,25 +62,23 @@ try {
 const pageTitle = recipe ? recipe.title : "Recipe Not Found";
 ---
 
-<Layout title={pageTitle}>
-  <main>
-    {
-      fetchError || !recipe ? (
-        <div class="max-w-4xl mx-auto px-4 py-8">
-          <div class="rounded-lg border border-destructive bg-destructive/10 p-6 text-center">
-            <h1 class="text-2xl font-bold text-destructive mb-2">Error Loading Recipe</h1>
-            <p class="text-muted-foreground mb-4">{fetchError || "Recipe not found"}</p>
-            <a
-              href="/recipes"
-              class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-primary text-primary-foreground hover:bg-primary/90 h-10 py-2 px-4"
-            >
-              Go to Recipes
-            </a>
-          </div>
+<AuthenticatedLayout title={pageTitle}>
+  {
+    fetchError || !recipe ? (
+      <div class="max-w-4xl mx-auto px-4 py-8">
+        <div class="rounded-lg border border-destructive bg-destructive/10 p-6 text-center">
+          <h1 class="text-2xl font-bold text-destructive mb-2">Error Loading Recipe</h1>
+          <p class="text-muted-foreground mb-4">{fetchError || "Recipe not found"}</p>
+          <a
+            href="/recipes"
+            class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-primary text-primary-foreground hover:bg-primary/90 h-10 py-2 px-4"
+          >
+            Go to Recipes
+          </a>
         </div>
-      ) : (
-        <RecipeDetailView client:load initialRecipe={recipe} recipeId={validation.data.id} />
-      )
-    }
-  </main>
-</Layout>
+      </div>
+    ) : (
+      <RecipeDetailView client:load initialRecipe={recipe} recipeId={validation.data.id} />
+    )
+  }
+</AuthenticatedLayout>
