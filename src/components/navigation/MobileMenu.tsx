@@ -2,6 +2,7 @@ import type { MobileMenuProps } from "@/types";
 import { NavLinks } from "./NavLinks";
 import { Button } from "@/components/ui/button";
 import { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 
 /**
  * MobileMenu component - Slide-out panel for mobile navigation
@@ -26,7 +27,7 @@ export function MobileMenu({ isOpen, onClose, userEmail, currentPath, onLogout }
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <>
       {/* Overlay backdrop */}
       <div className="fixed inset-0 bg-black/50 z-40 md:hidden" onClick={onClose} aria-hidden="true" />
@@ -91,6 +92,7 @@ export function MobileMenu({ isOpen, onClose, userEmail, currentPath, onLogout }
           </div>
         </div>
       </div>
-    </>
+    </>,
+    document.body
   );
 }
