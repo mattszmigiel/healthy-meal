@@ -1,0 +1,22 @@
+# Password Reset Page
+
+- **View name**: Password Reset
+- **Path**: `/reset-password`
+- **Main purpose**:
+  - Handle both requesting a reset email and setting a new password via reset link.
+- **Key information to display**:
+  - Mode 1: Request reset link → email input.
+  - Mode 2: Set new password → password + confirm fields (when accessed via token link).
+  - Success / error messages ("Check your email", "Password updated").
+- **Key view components**:
+  - Centered card layout.
+  - Form (mode-dependent).
+  - Link back to login.
+- **UX, accessibility, and security considerations**:
+  - Clear headings per mode ("Reset your password", "Choose a new password").
+  - Don't reveal whether the email is registered; generic success message ("If an account exists…").
+  - Enforce same password requirements as registration.
+  - Show message for expired/invalid reset link.
+- **Related requirements**:
+  - FR-003
+  - US-004
