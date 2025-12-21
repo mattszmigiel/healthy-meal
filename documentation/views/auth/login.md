@@ -1,0 +1,29 @@
+# Login Page
+
+- **View name**: Login
+- **Path**: `/login`
+- **Main purpose**:
+  - Allow registered users to authenticate with email and password.
+- **Key information to display**:
+  - Email and password fields.
+  - Link to registration.
+  - "Forgot your password?" link.
+  - Error messages for invalid credentials.
+- **Key view components**:
+  - Centered card layout.
+  - Form:
+    - Email input (`type="email"`).
+    - Password input (`type="password"`).
+    - Submit button.
+  - Links:
+    - "Create an account" → `/register`.
+    - "Forgot password?" → `/reset-password`.
+- **UX, accessibility, and security considerations**:
+  - No main navigation header (focus user on auth).
+  - Inline validation for email format; errors announced via `aria-live`.
+  - Generic error messaging on failed login (do not confirm if email exists).
+  - On success, redirect to `/recipes` (or to `returnUrl` if provided).
+  - Prevent access to protected pages without auth; redirect here with context.
+- **Related requirements**:
+  - FR-002, FR-004, FR-005
+  - US-002, US-003, US-005, US-024

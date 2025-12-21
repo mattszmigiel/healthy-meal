@@ -1,0 +1,31 @@
+# Registration Page
+
+- **View name**: Registration
+- **Path**: `/register`
+- **Main purpose**:
+  - Enable new users to create an account using email and password.
+- **Key information to display**:
+  - Email, password, confirm password fields.
+  - Password requirements (min 8 chars, etc.).
+  - Errors for invalid email, weak password, duplicate email.
+- **Key view components**:
+  - Centered card layout.
+  - Form:
+    - Email input.
+    - Password input + nearby text for requirements.
+    - Confirm password input.
+    - Submit button.
+  - Link to `/login`.
+- **UX, accessibility, and security considerations**:
+  - Real-time or on-blur validation:
+    - Email format with example (e.g., `name@example.com`).
+    - Password strength & policy text.
+  - Error text associated with inputs (`aria-describedby`).
+  - After successful registration:
+    - Auto-login.
+    - Redirect to `/recipes`.
+    - Trigger welcome/onboarding modal.
+  - Avoid exposing "email already exists" in a way that leaks account existence; generic message or careful phrasing.
+- **Related requirements**:
+  - FR-001, FR-004
+  - US-001, US-028, US-029, US-024

@@ -6,16 +6,22 @@ import type { DietaryPreferencesDTO } from "@/types";
 // Disable prerendering since this is a dynamic page
 export const prerender = false;
 
-// For now, using a test user email
-// TODO: Replace with actual session extraction logic when authentication is implemented
-const userEmail = "test@example.com";
+// Extract user email from session (middleware ensures user exists for protected routes)
+const userEmail = Astro.locals.user?.email ?? "";
 
 // Fetch dietary preferences via API (SSR)
 let preferences: DietaryPreferencesDTO | null = null;
 let fetchError: string | null = null;
 
 try {
-  const response = await fetch(`${Astro.url.origin}/api/profile/dietary-preferences`);
+  // Get cookies from the incoming request to pass to fetch
+  const cookieHeader = Astro.request.headers.get("cookie") || "";
+
+  const response = await fetch(`${Astro.url.origin}/api/profile/dietary-preferences`, {
+    headers: {
+      Cookie: cookieHeader,
+    },
+  });
 
   if (response.ok) {
     preferences = await response.json();

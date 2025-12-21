@@ -11,7 +11,6 @@ import {
   serviceUnavailableResponse,
   internalServerErrorResponse,
 } from "@/lib/utils/api-responses";
-import { DEFAULT_USER } from "@/db/supabase.client";
 import { logger, startTimer, getErrorStack } from "@/lib/utils/logger";
 
 export const prerender = false;
@@ -30,7 +29,12 @@ export const prerender = false;
  * @returns 500 - Internal server error
  */
 export const POST: APIRoute = async ({ params, locals }) => {
-  const userId = DEFAULT_USER;
+  // Ensure user is authenticated (defensive check)
+  if (!locals.user) {
+    return validationErrorResponse("Authentication required");
+  }
+
+  const userId = locals.user.id;
   const endTimer = startTimer("AI preview generation", {
     user_id: userId,
     endpoint: `/api/recipes/${params.id}/ai-preview`,

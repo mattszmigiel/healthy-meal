@@ -26,7 +26,7 @@ export class OpenRouterService {
     this.config = {
       apiKey: config.apiKey,
       baseUrl: config.baseUrl || "https://openrouter.ai/api/v1",
-      defaultModel: config.defaultModel || "openai/gpt-5-mini",
+      defaultModel: config.defaultModel || "openai/gpt-4o-mini",
       timeout: config.timeout || 30000,
       maxRetries: config.maxRetries || 3,
       retryDelay: config.retryDelay || 1000,

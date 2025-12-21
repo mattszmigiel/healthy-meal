@@ -593,3 +593,27 @@ export interface UseDietaryPreferencesReturn {
   savePreferences: () => Promise<void>;
   resetError: () => void;
 }
+
+// ============================================================================
+// AUTHENTICATION DTOs
+// ============================================================================
+
+/**
+ * Login Request DTO - Request payload for POST /api/auth/login
+ */
+export interface LoginRequestDTO {
+  email: string;
+  password: string;
+}
+
+/**
+ * Auth Response DTO - Response for successful authentication
+ * Used for login endpoint responses
+ */
+export interface AuthResponseDTO {
+  user: {
+    id: string;
+    email: string;
+  };
+  message: string;
+}

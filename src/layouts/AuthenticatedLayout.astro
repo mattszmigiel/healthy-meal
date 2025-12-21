@@ -8,8 +8,8 @@ interface Props {
 
 const { title = "HealthyMeal" } = Astro.props;
 
-// Extract user email from session
-const userEmail = "test"; // Replace with actual session extraction logic
+// Extract user email from session (middleware ensures user exists for protected routes)
+const userEmail = Astro.locals.user?.email ?? "";
 
 // Get current path for active link highlighting
 const currentPath = Astro.url.pathname;
