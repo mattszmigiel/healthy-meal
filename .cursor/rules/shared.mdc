@@ -6,7 +6,7 @@ alwaysApply: true
 # AI Rules for {app-name}
 
 {project-description}
-
+ 
 ## Tech Stack
 
 - Astro 5

@@ -12,8 +12,15 @@ let hasPreferences = false;
 let fetchError: string | null = null;
 
 try {
+  // Get cookies from the incoming request to pass to fetch
+  const cookieHeader = Astro.request.headers.get("cookie") || "";
+
   // Fetch first page of user's original recipes (not AI-generated)
-  const recipesResponse = await fetch(`${Astro.url.origin}/api/recipes?page=1&limit=20&is_ai_generated=false`);
+  const recipesResponse = await fetch(`${Astro.url.origin}/api/recipes?page=1&limit=20&is_ai_generated=false`, {
+    headers: {
+      Cookie: cookieHeader,
+    },
+  });
 
   if (!recipesResponse.ok) {
     throw new Error("Failed to fetch recipes");
@@ -22,7 +29,11 @@ try {
   initialRecipes = await recipesResponse.json();
 
   // Check if user has dietary preferences
-  const preferencesResponse = await fetch(`${Astro.url.origin}/api/profile/dietary-preferences`);
+  const preferencesResponse = await fetch(`${Astro.url.origin}/api/profile/dietary-preferences`, {
+    headers: {
+      Cookie: cookieHeader,
+    },
+  });
 
   if (preferencesResponse.ok) {
     await preferencesResponse.json();

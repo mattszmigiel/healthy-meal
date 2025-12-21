@@ -2,6 +2,14 @@
 import LandingLayout from "../layouts/LandingLayout.astro";
 import HeroSection from "../components/HeroSection.astro";
 import FeaturesSection from "../components/FeaturesSection.astro";
+
+// Disable static generation to check authentication status
+export const prerender = false;
+
+// Redirect authenticated users to recipes page
+if (Astro.locals.user) {
+  return Astro.redirect("/recipes");
+}
 ---
 
 <LandingLayout title="HealthyMeal - Adapt Any Recipe to Your Dietary Needs">

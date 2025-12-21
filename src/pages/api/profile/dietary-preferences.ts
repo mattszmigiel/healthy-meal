@@ -1,7 +1,6 @@
 import type { APIRoute } from "astro";
 import { updateDietaryPreferencesSchema } from "@/lib/schemas/dietaryPreferencesSchemas";
 import { DietaryPreferencesService } from "@/lib/services/dietaryPreferences.service";
-import { DEFAULT_USER } from "@/db/supabase.client";
 import type { APIErrorResponse } from "@/types";
 
 export const prerender = false;
@@ -12,9 +11,21 @@ export const prerender = false;
  */
 export const GET: APIRoute = async ({ locals }) => {
   try {
-    // Get dietary preferences via service (using DEFAULT_USER for testing)
+    // Ensure user is authenticated (defensive check)
+    if (!locals.user) {
+      const errorResponse: APIErrorResponse = {
+        error: "Unauthorized",
+        message: "Authentication required",
+      };
+      return new Response(JSON.stringify(errorResponse), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    // Get dietary preferences via service
     const service = new DietaryPreferencesService(locals.supabase);
-    const preferences = await service.getDietaryPreferences(DEFAULT_USER);
+    const preferences = await service.getDietaryPreferences(locals.user.id);
 
     return new Response(JSON.stringify(preferences), {
       status: 200,
@@ -51,6 +62,18 @@ export const GET: APIRoute = async ({ locals }) => {
 
 export const PUT: APIRoute = async ({ request, locals }) => {
   try {
+    // Ensure user is authenticated (defensive check)
+    if (!locals.user) {
+      const errorResponse: APIErrorResponse = {
+        error: "Unauthorized",
+        message: "Authentication required",
+      };
+      return new Response(JSON.stringify(errorResponse), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
     // Parse and validate request body
     const body = await request.json();
     const validationResult = updateDietaryPreferencesSchema.safeParse(body);
@@ -67,9 +90,9 @@ export const PUT: APIRoute = async ({ request, locals }) => {
       });
     }
 
-    // Update dietary preferences via service (using DEFAULT_USER for testing)
+    // Update dietary preferences via service
     const service = new DietaryPreferencesService(locals.supabase);
-    const updatedPreferences = await service.updateDietaryPreferences(DEFAULT_USER, validationResult.data);
+    const updatedPreferences = await service.updateDietaryPreferences(locals.user.id, validationResult.data);
 
     return new Response(JSON.stringify(updatedPreferences), {
       status: 200,

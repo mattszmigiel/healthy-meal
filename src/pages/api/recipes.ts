@@ -2,7 +2,6 @@ import type { APIRoute } from "astro";
 import { createRecipeSchema } from "@/lib/schemas/recipe.schema";
 import { RecipeListQuerySchema } from "@/lib/schemas/recipeQuerySchemas";
 import { RecipeService } from "@/lib/services/recipe.service";
-import { DEFAULT_USER } from "@/db/supabase.client";
 import type { APIErrorResponse } from "@/types";
 import { ZodError } from "zod";
 
@@ -15,6 +14,18 @@ export const prerender = false;
  */
 export const GET: APIRoute = async ({ request, locals }) => {
   try {
+    // Ensure user is authenticated (defensive check)
+    if (!locals.user) {
+      const errorResponse: APIErrorResponse = {
+        error: "Unauthorized",
+        message: "Authentication required",
+      };
+      return new Response(JSON.stringify(errorResponse), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
     // Extract query parameters from URL
     const url = new URL(request.url);
     const queryParams = {
@@ -29,7 +40,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
 
     // Initialize service and fetch recipes
     const service = new RecipeService(locals.supabase);
-    const result = await service.listUserRecipes(DEFAULT_USER, validatedParams);
+    const result = await service.listUserRecipes(locals.user.id, validatedParams);
 
     // Return successful response
     return new Response(JSON.stringify(result), {
@@ -69,6 +80,18 @@ export const GET: APIRoute = async ({ request, locals }) => {
  */
 export const POST: APIRoute = async ({ request, locals }) => {
   try {
+    // Ensure user is authenticated (defensive check)
+    if (!locals.user) {
+      const errorResponse: APIErrorResponse = {
+        error: "Unauthorized",
+        message: "Authentication required",
+      };
+      return new Response(JSON.stringify(errorResponse), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
     // Parse and validate request body
     const body = await request.json();
     const validationResult = createRecipeSchema.safeParse(body);
@@ -88,10 +111,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     const command = validationResult.data;
     const service = new RecipeService(locals.supabase);
+    const userId = locals.user.id;
 
     // Validate parent recipe if provided
     if (command.parent_recipe_id) {
-      const isValid = await service.validateParentRecipe(DEFAULT_USER, command.parent_recipe_id);
+      const isValid = await service.validateParentRecipe(userId, command.parent_recipe_id);
 
       if (!isValid) {
         const errorResponse: APIErrorResponse = {
@@ -106,7 +130,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     }
 
     // Create recipe
-    const recipe = await service.createRecipe(DEFAULT_USER, command);
+    const recipe = await service.createRecipe(userId, command);
 
     return new Response(JSON.stringify(recipe), {
       status: 201,

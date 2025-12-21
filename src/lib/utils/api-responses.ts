@@ -1,4 +1,5 @@
 import type { APIErrorResponse, NoPreferencesErrorResponse, RateLimitErrorResponse } from "@/types";
+import { AuthenticationError, ConflictError, RateLimitError, UnauthorizedError } from "@/lib/errors/auth.errors";
 
 /**
  * Generic error response helper
@@ -139,4 +140,42 @@ export function internalServerErrorResponse(message?: string): Response {
  */
 export function validationErrorResponse(message: string, details?: string[]): Response {
   return errorResponse(400, "Invalid input", message, details ? { details } : undefined);
+}
+
+/**
+ * Handle authentication errors
+ * Maps custom auth error classes to appropriate HTTP responses
+ *
+ * @param error - Error object (custom auth error or unknown error)
+ * @returns Response with appropriate status code and message
+ */
+export function handleAuthError(error: unknown): Response {
+  // Handle custom authentication error classes
+  if (error instanceof UnauthorizedError) {
+    // 401 - Invalid credentials
+    return errorResponse(401, "Unauthorized", error.message);
+  }
+
+  if (error instanceof ConflictError) {
+    // 409 - Email already exists
+    return errorResponse(409, "Conflict", error.message);
+  }
+
+  if (error instanceof RateLimitError) {
+    // 429 - Too many authentication attempts
+    return rateLimitResponse(60); // Default retry after 60 seconds
+  }
+
+  if (error instanceof AuthenticationError) {
+    // 400 - Generic auth error
+    return errorResponse(400, "Authentication error", error.message);
+  }
+
+  // Handle unknown errors
+  if (error instanceof Error) {
+    return internalServerErrorResponse(error.message);
+  }
+
+  // Fallback for completely unknown errors
+  return internalServerErrorResponse("An unexpected error occurred during authentication");
 }

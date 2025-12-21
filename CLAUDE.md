@@ -8,8 +8,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - TypeScript 5 - Type-safe JavaScript
 - React 19 - UI library for interactive components
 - Tailwind CSS 4 - Utility-first CSS framework
-- Shadcn/ui - Component library
+- Shadcn/ui - Component library built on Radix UI
 - Node.js adapter (standalone mode) - For server-side rendering
+- Supabase - PostgreSQL database with authentication and Row-Level Security (RLS)
+- Zod - Schema validation for API requests/responses
+- OpenRouter API - AI integration for recipe modification (currently using gpt-4o-mini)
+- React Hook Form - Form state management with Zod validation integration
+- Sonner - Toast notification system
+- Lucide React - Icon library
 
 ## Development Commands
 
@@ -38,17 +44,27 @@ npm run format
 The project follows a strict directory organization:
 
 - `./src` - source code
-- `./src/layouts` - Astro layouts
+- `./src/layouts` - Astro layouts (Layout.astro, LandingLayout.astro, AuthenticatedLayout.astro)
 - `./src/pages` - Astro pages (file-based routing)
 - `./src/pages/api` - API endpoints (use `export const prerender = false`)
-- `./src/middleware/index.ts` - Astro middleware for request/response modification
+  - API routes follow pattern: `/api/recipes.ts` (collection), `/api/recipes/[id].ts` (single resource)
+- `./src/middleware/index.ts` - Astro middleware that injects Supabase client into `context.locals.supabase`
 - `./src/db` - Supabase clients and types
-- `./src/types.ts` - Shared types for backend and frontend (Entities, DTOs)
+  - `database.types.ts` - Auto-generated Supabase types
+  - `supabase.client.ts` - Singleton Supabase client
+- `./src/types.ts` - **Central type definitions** for ALL entities, DTOs, ViewModels, Commands, and component props
 - `./src/components` - Client-side components (Astro for static, React for dynamic)
-- `./src/components/ui` - Shadcn/ui components
-- `./src/components/hooks` - Custom React hooks
+  - `./src/components/ui` - Shadcn/ui components
+  - `./src/components/hooks` - Custom React hooks
+  - `./src/components/auth` - Authentication forms (LoginForm, RegisterForm, etc.)
+  - `./src/components/navigation` - Navigation components (GlobalNav, UserMenu, etc.)
+  - `./src/components/profile` - Profile management components
+  - `./src/components/recipes` - Recipe management components
 - `./src/lib` - Services and helpers
-- `./src/lib/services` - Business logic extracted from API routes
+  - `./src/lib/services` - Business logic extracted from API routes (RecipeService, AIPreviewService, etc.)
+  - `./src/lib/schemas` - Zod validation schemas for all API endpoints
+  - `./src/lib/utils` - Utility functions (logger, api-responses, rate-limiter)
+- `./src/styles` - Global styles (global.css with Tailwind directives)
 - `./src/assets` - Static internal assets
 - `./public` - Public assets
 
@@ -107,16 +123,107 @@ The project follows a strict directory organization:
 
 ### Backend and Database
 - Use Supabase for backend services (authentication, database)
-- Validate API input with Zod schemas
-- **In Astro routes**: Access Supabase from `context.locals.supabase` (not direct import)
+- Validate API input with Zod schemas defined in `src/lib/schemas`
+- **In Astro routes**: Access Supabase from `context.locals.supabase` (injected by middleware, not direct import)
 - Use `SupabaseClient` type from `src/db/supabase.client.ts` (not from `@supabase/supabase-js`)
 - Extract business logic into services in `src/lib/services`
+- Services follow dependency injection pattern: pass `locals.supabase` to constructor
+- All types (entities, DTOs, commands) must be defined in central `src/types.ts` file
+
+### API Route Pattern
+```typescript
+// File: src/pages/api/recipes.ts
+export const prerender = false; // Required for dynamic API routes
+
+export const POST: APIRoute = async ({ request, locals }) => {
+  // 1. Validate input with Zod schema
+  const body = await request.json();
+  const validationResult = createRecipeSchema.safeParse(body);
+
+  if (!validationResult.success) {
+    return apiError("Invalid request body", 400);
+  }
+
+  // 2. Instantiate service with Supabase client from locals
+  const service = new RecipeService(locals.supabase);
+
+  // 3. Execute business logic
+  const result = await service.createRecipe(userId, validationResult.data);
+
+  // 4. Return standardized response
+  return apiSuccess(result, 201);
+};
+```
+
+### Service Layer Pattern
+- Services handle all business logic and database operations
+- Each service is instantiated with Supabase client dependency
+- Services throw specific errors that API routes catch and transform to user-friendly responses
+- Example: `RecipeService`, `AIPreviewService`, `DietaryPreferencesService`
+
+### Type System Organization
+**All types centralized in `src/types.ts`:**
+- **Entities**: Domain models (User, Recipe, RecipeAIMetadata, DietaryPreferences)
+- **DTOs**: API response types (ProfileDTO, RecipeResponseDTO, RecipeListResponseDTO)
+- **Commands**: API request types (CreateRecipeCommand, UpdateDietaryPreferencesCommand)
+- **ViewModels**: Complex UI state (RecipeDetailViewModel, RecipeListViewModel)
+- **Component Props**: React component prop types (RecipeFormProps, RecipeCardProps)
+
+### Authentication
+- Supabase handles authentication with email/password
+- Row-Level Security (RLS) enforces data isolation per user
+- Currently using hardcoded DEFAULT_USER for development: `ce4988b8-5c26-4741-b5c3-fd372088ed89`
+- Access user session via `locals.supabase.auth.getUser()`
 
 ## Git Hooks
 
 Pre-commit hook runs `lint-staged`:
 - Auto-fixes ESLint issues on `*.{ts,tsx,astro}` files
 - Auto-formats `*.{json,css,md}` files with Prettier
+
+## AI Integration (OpenRouter)
+
+The app uses OpenRouter API for AI-powered recipe modification:
+
+- **Service**: `src/lib/services/openrouter/openrouter.service.ts`
+- **Current Model**: `gpt-4o-mini` (configurable via environment)
+- **Features**: Retry logic, error handling, structured output validation
+- **Use Case**: Modify recipes based on user dietary preferences
+- **Architecture**: Modular service with separate validation, transformation, and helper modules
+
+### AI Preview Flow
+1. User requests recipe modification on recipe detail page
+2. Frontend calls `/api/recipes/[id]/ai-preview` endpoint
+3. API route validates request and fetches recipe + dietary preferences
+4. `AIPreviewService` constructs prompt with recipe data and preferences
+5. OpenRouter processes request and returns modified recipe
+6. Response validated with Zod schema and returned to client
+7. User can save AI-modified version as new recipe
+
+## Data Flow Architecture
+
+### Adding a New Feature (Standard Pattern)
+1. Define types in `src/types.ts` (Entity, DTO, Command, Props)
+2. Create Zod validation schema in `src/lib/schemas/`
+3. Create service class in `src/lib/services/` with business logic
+4. Create API route in `src/pages/api/` following the API Route Pattern
+5. Create React components in `src/components/` (if needed)
+6. Create custom hook in `src/components/hooks/` for complex client state (if needed)
+
+### Request Flow
+```
+Astro Page (SSR)
+  ↓ Server-side data fetch
+React Component (receives initial data as props)
+  ↓ User interaction (form submit, button click)
+API Route (validates with Zod)
+  ↓ Instantiates service with locals.supabase
+Service Layer (executes business logic)
+  ↓ Database operations via Supabase
+Response (standardized DTO)
+  ↓ Updates client state
+React Component (re-renders)
+```
 
 ## Important Notes
 
@@ -125,3 +232,6 @@ Pre-commit hook runs `lint-staged`:
 - Uses Node.js adapter in standalone mode
 - Sitemap integration enabled
 - Lint before committing (enforced by husky + lint-staged)
+- All environment variables accessed via `import.meta.env`
+- View Transitions API enabled for smooth client-side navigation
+- React Compiler plugin available for optimization hints
