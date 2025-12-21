@@ -617,3 +617,11 @@ export interface AuthResponseDTO {
   };
   message: string;
 }
+
+/**
+ * Logout Response DTO - Response for POST /api/auth/logout
+ * Simple success message for logout operations
+ */
+export interface LogoutResponseDTO {
+  message: string;
+}
