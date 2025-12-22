@@ -8,7 +8,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { Database } from "@/db/database.types";
-import { UnauthorizedError } from "@/lib/errors/auth.errors";
+import { ExpiredTokenError, InvalidTokenError, UnauthorizedError } from "@/lib/errors/auth.errors";
 import type { AuthResponseDTO } from "@/types";
 
 /**
@@ -77,6 +77,58 @@ export class AuthService {
   }
 
   /**
+   * Register a new user with email and password
+   *
+   * Creates a new user account and automatically signs them in.
+   * Email confirmation is disabled for MVP - users get immediate access.
+   *
+   * @param email - User email address
+   * @param password - User password (minimum 8 characters)
+   * @returns AuthResponseDTO with user info and success message
+   * @throws AuthenticationError if registration fails or email already exists
+   */
+  async register(email: string, password: string): Promise<AuthResponseDTO> {
+    const { data, error } = await this.supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: undefined, // No email confirmation for MVP
+      },
+    });
+
+    if (error) {
+      // Use generic message to prevent email enumeration
+      if (error.message.includes("already registered") || error.message.includes("already exists")) {
+        throw new UnauthorizedError("Registration failed. Please try again or login if you already have an account.");
+      }
+
+      if (error.message.includes("Password") || error.message.includes("password")) {
+        throw new UnauthorizedError("Password does not meet requirements");
+      }
+
+      if (error.message.includes(AUTH_ERRORS.TOO_MANY_REQUESTS)) {
+        throw new UnauthorizedError("Too many registration attempts. Please try again later.");
+      }
+
+      // Generic error for any other registration failure
+      throw new UnauthorizedError("Registration failed. Please try again.");
+    }
+
+    if (!data.user) {
+      throw new UnauthorizedError("Registration failed. Please try again.");
+    }
+
+    // Return successful registration response
+    return {
+      user: {
+        id: data.user.id,
+        email: data.user.email ?? email,
+      },
+      message: "Account created successfully",
+    };
+  }
+
+  /**
    * Sign out the current user session
    *
    * Signs out the current session only (local scope).
@@ -123,5 +175,103 @@ export class AuthService {
       // Middleware will handle lack of session on next request
       return { message: "Logged out successfully" };
     }
+  }
+
+  /**
+   * Send password reset email via Supabase Auth
+   *
+   * Security: Always returns success to prevent email enumeration attacks.
+   * This prevents attackers from discovering which emails are registered.
+   *
+   * @param email - User email address
+   * @returns void - Always succeeds (errors are logged but not thrown)
+   */
+  async requestPasswordReset(email: string): Promise<void> {
+    const siteUrl = import.meta.env.SITE_URL || "http://localhost:3000";
+    const redirectTo = `${siteUrl}/set-new-password`;
+
+    const { error } = await this.supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: redirectTo,
+    });
+
+    // Silently handle errors to prevent email enumeration
+    // Don't reveal if email exists in the system
+    if (error) {
+      // Log for server-side monitoring (never expose to client)
+      console.error("Password reset request error:", {
+        message: error.message,
+        email: email.substring(0, 3) + "***", // Partial email for privacy
+        timestamp: new Date().toISOString(),
+      });
+      // Could integrate with monitoring service here (e.g., Sentry)
+    }
+
+    // Always return success - no indication whether email exists
+    return;
+  }
+
+  /**
+   * Confirm password reset using recovery access token
+   *
+   * Flow:
+   * 1. User clicks email link → Supabase redirects with access_token in URL hash
+   * 2. Frontend extracts access_token and sends to this endpoint
+   * 3. Backend uses the token to authenticate and update password
+   *
+   * Security: The access_token is a short-lived JWT that Supabase provides
+   * after verifying the recovery link. We use it to create an authenticated
+   * session and update the password.
+   *
+   * @param accessToken - Access token from URL hash (after email link redirect)
+   * @param newPassword - New password meeting strength requirements
+   * @throws InvalidTokenError if token is invalid or malformed
+   * @throws ExpiredTokenError if token has expired
+   * @throws UnauthorizedError if password update fails
+   */
+  async confirmPasswordReset(accessToken: string, newPassword: string): Promise<void> {
+    // Step 1: Set the session using the access token
+    // This validates the token and creates an authenticated session
+    const { data: sessionData, error: sessionError } = await this.supabase.auth.exchangeCodeForSession(accessToken);
+
+    // Handle token validation errors
+    if (sessionError || !sessionData.session) {
+      // Check for specific error types
+      if (sessionError?.message.includes("expired") || sessionError?.message.includes("Invalid")) {
+        throw new InvalidTokenError("Invalid or expired reset token");
+      }
+
+      // Log for debugging (don't expose to client)
+      console.error("Session creation error:", {
+        message: sessionError?.message,
+        timestamp: new Date().toISOString(),
+      });
+
+      // Generic invalid token error (prevents information leakage)
+      throw new InvalidTokenError("Invalid or expired reset token");
+    }
+
+    // Step 2: Update password using the authenticated session
+    const { error: updateError } = await this.supabase.auth.updateUser({
+      password: newPassword,
+    });
+
+    if (updateError) {
+      // Check for specific error types
+      if (updateError.message.includes("expired")) {
+        throw new ExpiredTokenError("Reset link has expired");
+      }
+
+      // Log error for monitoring
+      console.error("Password update error:", {
+        message: updateError.message,
+        timestamp: new Date().toISOString(),
+      });
+
+      // Generic error (don't expose internal details)
+      throw new UnauthorizedError("Failed to update password");
+    }
+
+    // Password successfully updated
+    return;
   }
 }

@@ -1,5 +1,12 @@
 import type { APIErrorResponse, NoPreferencesErrorResponse, RateLimitErrorResponse } from "@/types";
-import { AuthenticationError, ConflictError, RateLimitError, UnauthorizedError } from "@/lib/errors/auth.errors";
+import {
+  AuthenticationError,
+  ConflictError,
+  ExpiredTokenError,
+  InvalidTokenError,
+  RateLimitError,
+  UnauthorizedError,
+} from "@/lib/errors/auth.errors";
 
 /**
  * Generic error response helper
@@ -164,6 +171,12 @@ export function handleAuthError(error: unknown): Response {
   if (error instanceof RateLimitError) {
     // 429 - Too many authentication attempts
     return rateLimitResponse(60); // Default retry after 60 seconds
+  }
+
+  if (error instanceof InvalidTokenError || error instanceof ExpiredTokenError) {
+    // 400 - Invalid or expired password reset token
+    // Generic message for security (don't differentiate between invalid/expired)
+    return errorResponse(400, "Invalid token", "This reset link is invalid or has expired");
   }
 
   if (error instanceof AuthenticationError) {

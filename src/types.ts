@@ -625,3 +625,27 @@ export interface AuthResponseDTO {
 export interface LogoutResponseDTO {
   message: string;
 }
+
+/**
+ * Reset Password Request DTO - Request payload for POST /api/auth/reset-password-request
+ */
+export interface ResetPasswordRequestDTO {
+  email: string;
+}
+
+/**
+ * Reset Password Confirm DTO - Request payload for POST /api/auth/reset-password-confirm
+ * The access_token comes from the URL hash after Supabase redirects from the email link
+ */
+export interface ResetPasswordConfirmDTO {
+  access_token: string;
+  password: string;
+}
+
+/**
+ * Password Reset Response DTO - Response for password reset operations
+ * Generic success message to prevent email enumeration
+ */
+export interface PasswordResetResponseDTO {
+  message: string;
+}
