@@ -8,7 +8,13 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { Database } from "@/db/database.types";
-import { AuthenticationError, ExpiredTokenError, InvalidTokenError, UnauthorizedError } from "@/lib/errors/auth.errors";
+import {
+  AuthenticationError,
+  ConflictError,
+  ExpiredTokenError,
+  InvalidTokenError,
+  UnauthorizedError,
+} from "@/lib/errors/auth.errors";
 import type { AuthResponseDTO } from "@/types";
 
 /**
@@ -99,7 +105,7 @@ export class AuthService {
     if (error) {
       // Use generic message to prevent email enumeration
       if (error.message.includes("already registered") || error.message.includes("already exists")) {
-        throw new AuthenticationError("Registration failed. Please try again or login if you already have an account.");
+        throw new ConflictError("Registration failed. Please try again or login if you already have an account.");
       }
 
       if (error.message.includes("Password") || error.message.includes("password")) {
