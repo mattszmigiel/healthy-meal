@@ -21,7 +21,7 @@ export function SetNewPasswordForm({ code }: SetNewPasswordFormProps) {
   const form = useForm<FormValues>({
     resolver: zodResolver(ResetPasswordConfirmSchema),
     defaultValues: {
-      access_token: code,
+      code: code,
       password: "",
       confirmPassword: "",
     },
@@ -38,7 +38,7 @@ export function SetNewPasswordForm({ code }: SetNewPasswordFormProps) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          access_token: data.access_token,
+          code: data.code,
           password: data.password,
         }),
         credentials: "include",
@@ -74,7 +74,7 @@ export function SetNewPasswordForm({ code }: SetNewPasswordFormProps) {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         {/* Hidden field for the recovery code */}
-        <input type="hidden" {...form.register("access_token")} />
+        <input type="hidden" {...form.register("code")} />
 
         {error && (
           <div

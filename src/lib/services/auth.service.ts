@@ -8,7 +8,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { Database } from "@/db/database.types";
-import { ExpiredTokenError, InvalidTokenError, UnauthorizedError } from "@/lib/errors/auth.errors";
+import { AuthenticationError, ExpiredTokenError, InvalidTokenError, UnauthorizedError } from "@/lib/errors/auth.errors";
 import type { AuthResponseDTO } from "@/types";
 
 /**
@@ -99,23 +99,23 @@ export class AuthService {
     if (error) {
       // Use generic message to prevent email enumeration
       if (error.message.includes("already registered") || error.message.includes("already exists")) {
-        throw new UnauthorizedError("Registration failed. Please try again or login if you already have an account.");
+        throw new AuthenticationError("Registration failed. Please try again or login if you already have an account.");
       }
 
       if (error.message.includes("Password") || error.message.includes("password")) {
-        throw new UnauthorizedError("Password does not meet requirements");
+        throw new AuthenticationError("Password does not meet requirements");
       }
 
       if (error.message.includes(AUTH_ERRORS.TOO_MANY_REQUESTS)) {
-        throw new UnauthorizedError("Too many registration attempts. Please try again later.");
+        throw new AuthenticationError("Too many registration attempts. Please try again later.");
       }
 
       // Generic error for any other registration failure
-      throw new UnauthorizedError("Registration failed. Please try again.");
+      throw new AuthenticationError("Registration failed. Please try again.");
     }
 
     if (!data.user) {
-      throw new UnauthorizedError("Registration failed. Please try again.");
+      throw new AuthenticationError("Registration failed. Please try again.");
     }
 
     // Return successful registration response
@@ -211,27 +211,27 @@ export class AuthService {
   }
 
   /**
-   * Confirm password reset using recovery access token
+   * Confirm password reset using recovery code
    *
    * Flow:
-   * 1. User clicks email link → Supabase redirects with access_token in URL hash
-   * 2. Frontend extracts access_token and sends to this endpoint
-   * 3. Backend uses the token to authenticate and update password
+   * 1. User clicks email link → Supabase redirects with code in URL hash
+   * 2. Frontend extracts code and sends to this endpoint
+   * 3. Backend uses the code to authenticate and update password
    *
-   * Security: The access_token is a short-lived JWT that Supabase provides
+   * Security: The code is a short-lived JWT that Supabase provides
    * after verifying the recovery link. We use it to create an authenticated
    * session and update the password.
    *
-   * @param accessToken - Access token from URL hash (after email link redirect)
+   * @param code - Recovery code from URL hash (after email link redirect)
    * @param newPassword - New password meeting strength requirements
    * @throws InvalidTokenError if token is invalid or malformed
    * @throws ExpiredTokenError if token has expired
    * @throws UnauthorizedError if password update fails
    */
-  async confirmPasswordReset(accessToken: string, newPassword: string): Promise<void> {
-    // Step 1: Set the session using the access token
-    // This validates the token and creates an authenticated session
-    const { data: sessionData, error: sessionError } = await this.supabase.auth.exchangeCodeForSession(accessToken);
+  async confirmPasswordReset(code: string, newPassword: string): Promise<void> {
+    // Step 1: Set the session using the recovery code
+    // This validates the code and creates an authenticated session
+    const { data: sessionData, error: sessionError } = await this.supabase.auth.exchangeCodeForSession(code);
 
     // Handle token validation errors
     if (sessionError || !sessionData.session) {

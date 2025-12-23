@@ -1,17 +1,17 @@
 /**
  * POST /api/auth/reset-password-confirm
  *
- * Confirms password reset using access token from URL hash.
- * The access_token comes from Supabase redirect after user clicks email link.
+ * Confirms password reset using code from URL query parameters.
+ * The code comes from Supabase redirect after user clicks email link.
  *
  * Flow:
- * 1. User clicks email link → Supabase redirects to /reset-password#access_token=XXX
- * 2. Frontend extracts access_token from URL hash
- * 3. Frontend sends access_token + new password to this endpoint
+ * 1. User clicks email link → Supabase redirects to /set-new-password?code=XXX
+ * 2. Frontend extracts code from URL query parameters
+ * 3. Frontend sends code + new password to this endpoint
  * 4. Backend validates token and updates password
  *
  * Request Body:
- * - access_token: string (from URL hash after email redirect)
+ * - code: string (from URL query parameters after email redirect)
  * - password: string (new password, minimum 8 characters)
  *
  * Success Response (200):
@@ -50,13 +50,13 @@ export const POST: APIRoute = async ({ request, locals }) => {
       );
     }
 
-    const { access_token, password } = validationResult.data;
+    const { code, password } = validationResult.data;
 
     // Instantiate AuthService with Supabase client from locals
     const authService = new AuthService(locals.supabase);
 
-    // Confirm password reset (validates access_token and updates password)
-    await authService.confirmPasswordReset(access_token, password);
+    // Confirm password reset (validates code and updates password)
+    await authService.confirmPasswordReset(code, password);
 
     // Return success response
     const response: PasswordResetResponseDTO = {

@@ -7,28 +7,19 @@ import { SetNewPasswordForm } from "./SetNewPasswordForm";
 function extractRecoveryCode(): string | null {
   if (typeof window === "undefined") return null;
 
-  console.log("🔍 Extracting recovery code");
-  console.log("📍 Current URL:", window.location.href);
-  console.log("🔗 Search params:", window.location.search);
-
   const params = new URLSearchParams(window.location.search);
   const recoveryCode = params.get("code");
-  console.log("🔑 Recovery code:", recoveryCode);
 
   if (recoveryCode) {
-    console.log("✅ Valid recovery code found");
-    // Clean up URL (remove query params for security)
     window.history.replaceState(null, "", "/set-new-password");
-    console.log("🧹 URL cleaned");
     return recoveryCode;
   }
 
-  console.log("❌ No recovery code in query params");
   return null;
 }
 
 /**
- * Wrapper component that extracts recovery code from URL hash
+ * Wrapper component that extracts recovery code from URL query parameters
  * and mounts the SetNewPasswordForm if a valid code is found
  */
 export function SetNewPasswordWrapper() {
