@@ -15,6 +15,13 @@ AI - Communication with models through Openrouter.ai service:
 - Access to a wide range of models (OpenAI, Anthropic, Google and many others), which will allow us to find a solution providing high efficiency and low costs
 - Allows setting financial limits on API keys
 
+Testing:
+- Vitest for unit and integration testing - built for Vite/Astro ecosystem with fast execution and Jest-compatible API
+- Playwright for end-to-end testing - multi-browser testing with reliable auto-waiting and screenshot/video capture
+- React Testing Library for component testing - user-centric approach to testing React components
+- Supertest for HTTP API testing - HTTP assertions for API route testing
+- MSW (Mock Service Worker) for mocking external services - intercept and mock HTTP requests in tests
+
 CI/CD and Hosting:
 - Github Actions for creating CI/CD pipelines
 - DigitalOcean for hosting the application via docker image

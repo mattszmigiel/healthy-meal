@@ -63,6 +63,22 @@ HealthyMeal is a web-based recipe management application that leverages artifici
   - High efficiency and low costs
   - Financial limits on API keys
 
+### Testing
+- **[Vitest](https://vitest.dev/)** - Unit and integration testing
+  - Built for Vite/Astro ecosystem
+  - Fast execution with Jest-compatible API
+  - Excellent TypeScript support
+- **[Playwright](https://playwright.dev/)** - End-to-end testing
+  - Multi-browser testing (Chrome, Firefox, Safari)
+  - Reliable auto-waiting and screenshot/video capture
+  - Excellent Astro support
+- **[React Testing Library](https://testing-library.com/react)** - Component testing
+  - User-centric approach to testing React components
+- **[Supertest](https://github.com/ladjs/supertest)** - HTTP API testing
+  - HTTP assertions for API route testing
+- **[MSW](https://mswjs.io/)** (Mock Service Worker) - API mocking
+  - Intercept and mock HTTP requests in tests
+
 ### CI/CD and Hosting
 - **GitHub Actions** - CI/CD pipelines
 - **DigitalOcean** - Application hosting via Docker image
