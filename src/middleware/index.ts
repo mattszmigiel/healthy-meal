@@ -9,10 +9,12 @@ const PUBLIC_PATHS = [
   "/login",
   "/register",
   "/reset-password",
+  "/set-new-password",
   // Auth API endpoints
   "/api/auth/login",
   "/api/auth/register",
-  "/api/auth/reset-password",
+  "/api/auth/reset-password-request",
+  "/api/auth/reset-password-confirm",
 ];
 
 // Helper to check if path is an API route

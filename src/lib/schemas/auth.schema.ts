@@ -36,10 +36,11 @@ export const ResetPasswordRequestSchema = z.object({
 
 /**
  * Reset Password Confirm Schema - Client-side validation for password reset confirmation
+ * The code is extracted from URL query parameters after Supabase email redirect
  */
 export const ResetPasswordConfirmSchema = z
   .object({
-    token: z.string().min(1, "Reset token is required"),
+    code: z.string().min(1, "Reset token is required"),
     password: z
       .string()
       .min(8, "Password must be at least 8 characters")
@@ -63,5 +64,14 @@ export const LoginRequestSchema = z.object({
 
 export const RegisterRequestSchema = z.object({
   email: z.string().email(),
+  password: z.string().min(8),
+});
+
+export const ResetPasswordRequestServerSchema = z.object({
+  email: z.string().email(),
+});
+
+export const ResetPasswordConfirmServerSchema = z.object({
+  code: z.string().min(1),
   password: z.string().min(8),
 });

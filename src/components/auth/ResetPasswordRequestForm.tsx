@@ -7,22 +7,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
-type ResetPasswordRequestValues = z.infer<typeof ResetPasswordRequestSchema>;
+type FormValues = z.infer<typeof ResetPasswordRequestSchema>;
 
-export function ResetPasswordForm() {
+export function ResetPasswordRequestForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // Request mode form
-  const requestForm = useForm<ResetPasswordRequestValues>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(ResetPasswordRequestSchema),
     defaultValues: {
       email: "",
     },
   });
 
-  const onRequestSubmit = async (data: ResetPasswordRequestValues) => {
+  const onSubmit = async (data: FormValues) => {
     setIsLoading(true);
     setError(null);
 
@@ -56,8 +55,8 @@ export function ResetPasswordForm() {
   };
 
   return (
-    <Form {...requestForm}>
-      <form onSubmit={requestForm.handleSubmit(onRequestSubmit)} className="space-y-4">
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         {error && (
           <div
             className="rounded-md bg-destructive/10 border border-destructive/20 p-3 text-sm text-destructive"
@@ -80,7 +79,7 @@ export function ResetPasswordForm() {
         ) : (
           <>
             <FormField
-              control={requestForm.control}
+              control={form.control}
               name="email"
               render={({ field }) => (
                 <FormItem>
