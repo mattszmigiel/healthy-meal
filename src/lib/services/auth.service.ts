@@ -240,12 +240,6 @@ export class AuthService {
         throw new InvalidTokenError("Invalid or expired reset token");
       }
 
-      // Log for debugging (don't expose to client)
-      console.error("Session creation error:", {
-        message: sessionError?.message,
-        timestamp: new Date().toISOString(),
-      });
-
       // Generic invalid token error (prevents information leakage)
       throw new InvalidTokenError("Invalid or expired reset token");
     }
@@ -260,12 +254,6 @@ export class AuthService {
       if (updateError.message.includes("expired")) {
         throw new ExpiredTokenError("Reset link has expired");
       }
-
-      // Log error for monitoring
-      console.error("Password update error:", {
-        message: updateError.message,
-        timestamp: new Date().toISOString(),
-      });
 
       // Generic error (don't expose internal details)
       throw new UnauthorizedError("Failed to update password");
