@@ -1,5 +1,13 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { vi } from "vitest";
+import type { APIContext } from "astro";
+
+interface MockAPIContextOverrides {
+  request?: Partial<Request>;
+  locals?: Partial<APIContext["locals"]>;
+  params?: Record<string, string>;
+  cookies?: Partial<APIContext["cookies"]>;
+}
 
 /**
  * Creates a mock Supabase client for testing
@@ -29,8 +37,7 @@ export function createMockSupabaseClient(): Partial<SupabaseClient> {
 /**
  * Creates a mock APIContext for testing API routes
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function createMockAPIContext(overrides: any = {}) {
+export function createMockAPIContext(overrides: MockAPIContextOverrides = {}) {
   return {
     request: new Request("http://localhost:3000/api/test", {
       method: "GET",
