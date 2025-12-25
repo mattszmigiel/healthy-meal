@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { RecipeService } from "./recipe.service";
+import { RecipeService } from "../recipe.service";
 import type { CreateRecipeCommand, RecipeListQueryParams } from "@/types";
 
 // Mock Supabase client at the top level

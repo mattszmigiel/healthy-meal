@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { DietaryPreferencesService } from "./dietaryPreferences.service";
+import { DietaryPreferencesService } from "../dietaryPreferences.service";
 import type { DietaryPreferencesDTO, UpdateDietaryPreferencesCommand } from "@/types";
 
 // Mock Supabase client at the top level

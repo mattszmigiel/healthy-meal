@@ -20,7 +20,7 @@ import {
   UnauthorizedError,
 } from "@/lib/errors/auth.errors";
 import { createMockSupabaseClient } from "@/test/helpers/api-test-helpers";
-import { AuthService } from "./auth.service";
+import { AuthService } from "../auth.service";
 
 /**
  * Creates a mock Supabase User object with all required fields
