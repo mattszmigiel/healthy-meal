@@ -60,6 +60,15 @@ jobs:
     needs: lint
     environment: integration
 
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      SITE_URL: ${{ secrets.SITE_URL }}
+      E2E_USERNAME_ID: ${{ secrets.E2E_USERNAME_ID }}
+      E2E_USERNAME: ${{ secrets.E2E_USERNAME }}
+      E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -72,18 +81,6 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-
-      - name: Create .env.test file
-        run: |
-          cat > .env.test << EOF
-          SUPABASE_URL=${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}
-          OPENROUTER_API_KEY=${{ secrets.OPENROUTER_API_KEY }}
-          SITE_URL=${{ secrets.SITE_URL }}
-          E2E_USERNAME_ID=${{ secrets.E2E_USERNAME_ID }}
-          E2E_USERNAME=${{ secrets.E2E_USERNAME }}
-          E2E_PASSWORD=${{ secrets.E2E_PASSWORD }}
-          EOF
 
       - name: Install Playwright browsers
         run: npx playwright install chromium --with-deps
