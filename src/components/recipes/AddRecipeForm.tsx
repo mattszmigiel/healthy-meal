@@ -106,10 +106,12 @@ export function AddRecipeForm() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <form onSubmit={handleSubmit} className="space-y-6" aria-busy={isSubmitting}>
+      <form onSubmit={handleSubmit} className="space-y-6" aria-busy={isSubmitting} data-testid="add-recipe-form">
         {/* Page Header */}
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">Create Recipe</h1>
+          <h1 className="text-3xl font-bold tracking-tight" data-testid="form-heading">
+            Create Recipe
+          </h1>
           <p className="text-muted-foreground">Add a new recipe to your collection. Fill in the details below.</p>
         </div>
 
@@ -145,6 +147,7 @@ export function AddRecipeForm() {
             aria-required="true"
             className={cn(errors.title && "border-destructive focus-visible:ring-destructive")}
             disabled={isSubmitting}
+            data-testid="recipe-title-input"
           />
           {errors.title && (
             <p id="title-error" className="text-sm text-destructive" role="alert">
@@ -171,6 +174,7 @@ export function AddRecipeForm() {
             aria-required="true"
             className={cn(errors.ingredients && "border-destructive focus-visible:ring-destructive")}
             disabled={isSubmitting}
+            data-testid="recipe-ingredients-input"
           />
           {errors.ingredients && (
             <p id="ingredients-error" className="text-sm text-destructive" role="alert">
@@ -197,6 +201,7 @@ export function AddRecipeForm() {
             aria-required="true"
             className={cn(errors.instructions && "border-destructive focus-visible:ring-destructive")}
             disabled={isSubmitting}
+            data-testid="recipe-instructions-input"
           />
           {errors.instructions && (
             <p id="instructions-error" className="text-sm text-destructive" role="alert">
@@ -224,10 +229,16 @@ export function AddRecipeForm() {
 
         {/* Form Actions */}
         <div className="flex gap-3 pt-4">
-          <Button type="button" variant="outline" onClick={handleCancel} disabled={isSubmitting}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleCancel}
+            disabled={isSubmitting}
+            data-testid="cancel-button"
+          >
             Cancel
           </Button>
-          <Button type="submit" disabled={isSubmitDisabled} className="min-w-[120px]">
+          <Button type="submit" disabled={isSubmitDisabled} className="min-w-[120px]" data-testid="save-recipe-button">
             {isSubmitting ? (
               <span className="flex items-center gap-2">
                 <svg

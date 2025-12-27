@@ -77,18 +77,12 @@ describe("OpenRouterService", () => {
     apiKey: testApiKey,
   };
 
-  // Suppress unhandled rejections from retry logic tests
-  let originalOnUnhandledRejection: ((event: PromiseRejectionEvent) => void) | null;
-
   beforeEach(() => {
     vi.clearAllMocks();
     vi.useFakeTimers();
 
     // Suppress console errors from expected failures in tests
     vi.spyOn(console, "error").mockImplementation(() => undefined);
-
-    // Store original handler and suppress unhandled rejections during tests
-    originalOnUnhandledRejection = process.listeners("unhandledRejection")[0] as any;
   });
 
   afterEach(() => {

@@ -122,10 +122,14 @@ export function RecipeDetailView({ initialRecipe, recipeId }: RecipeDetailViewPr
     <div className="max-w-4xl mx-auto px-4 py-8">
       <div className="space-y-6">
         {/* Breadcrumb Navigation */}
-        <nav aria-label="Breadcrumb" className="text-sm text-muted-foreground">
+        <nav aria-label="Breadcrumb" className="text-sm text-muted-foreground" data-testid="recipe-breadcrumb">
           <ol className="flex items-center gap-2">
             <li>
-              <a href="/recipes" className="hover:text-foreground transition-colors">
+              <a
+                href="/recipes"
+                className="hover:text-foreground transition-colors"
+                data-testid="breadcrumb-recipes-link"
+              >
                 Recipes
               </a>
             </li>

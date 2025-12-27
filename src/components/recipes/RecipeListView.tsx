@@ -55,7 +55,7 @@ export function RecipeListView({ initialRecipes, hasPreferences }: RecipeListVie
       {/* Header with View Toggle and Add Recipe button */}
       <div className="flex items-center justify-between mb-6">
         <ViewToggle currentView={currentView} onChange={switchView} />
-        <Button onClick={handleAddRecipe}>
+        <Button onClick={handleAddRecipe} data-testid="add-recipe-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"

@@ -32,7 +32,7 @@ export function RecipeGrid({ recipes, isLoading, currentView }: RecipeGridProps)
 
   // Show recipe cards
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-testid="recipe-grid">
       {recipes.map((recipe) => (
         <RecipeCard key={recipe.id} recipe={recipe} showAIBadge={currentView === "ai-modified"} />
       ))}
