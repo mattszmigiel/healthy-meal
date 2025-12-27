@@ -63,9 +63,8 @@ export type DietaryPreferencesDTO = DietaryPreferencesEntity;
  * Update Dietary Preferences Command - Request for PUT /api/profile/dietary-preferences
  * Allows updating any combination of dietary preference fields
  */
-export type UpdateDietaryPreferencesCommand = Pick<
-  DietaryPreferencesEntity,
-  "diet_type" | "allergies" | "disliked_ingredients"
+export type UpdateDietaryPreferencesCommand = Partial<
+  Pick<DietaryPreferencesEntity, "diet_type" | "allergies" | "disliked_ingredients">
 >;
 
 // ============================================================================
