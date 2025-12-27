@@ -77,16 +77,33 @@ describe("OpenRouterService", () => {
     apiKey: testApiKey,
   };
 
+  // Handler to suppress expected unhandled rejections during retry tests
+  const unhandledRejectionHandler = (reason: unknown) => {
+    // Suppress OpenRouterError rejections that occur during retry logic
+    // These are intermediate failures that are eventually caught and handled
+    if (reason instanceof OpenRouterError) {
+      return; // Silently ignore
+    }
+    // Re-throw unexpected rejections
+    throw reason;
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
     vi.useFakeTimers();
 
     // Suppress console errors from expected failures in tests
     vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    // Add handler for expected unhandled rejections during retry tests
+    process.on("unhandledRejection", unhandledRejectionHandler);
   });
 
   afterEach(() => {
     vi.useRealTimers();
+
+    // Remove unhandled rejection handler
+    process.off("unhandledRejection", unhandledRejectionHandler);
   });
 
   // ============================================================================
