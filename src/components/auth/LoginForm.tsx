@@ -71,6 +71,7 @@ export function LoginForm({ returnUrl }: LoginFormProps) {
             className="rounded-md bg-destructive/10 border border-destructive/20 p-3 text-sm text-destructive"
             role="alert"
             aria-live="polite"
+            data-testid="login-error-message"
           >
             {error}
           </div>
@@ -83,7 +84,13 @@ export function LoginForm({ returnUrl }: LoginFormProps) {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input type="email" placeholder="name@example.com" autoComplete="email" {...field} />
+                <Input
+                  type="email"
+                  placeholder="name@example.com"
+                  autoComplete="email"
+                  data-testid="login-email-input"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -97,14 +104,14 @@ export function LoginForm({ returnUrl }: LoginFormProps) {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input type="password" autoComplete="current-password" {...field} />
+                <Input type="password" autoComplete="current-password" data-testid="login-password-input" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <Button type="submit" className="w-full" disabled={isLoading}>
+        <Button type="submit" className="w-full" disabled={isLoading} data-testid="login-submit-button">
           {isLoading ? "Logging in..." : "Log in"}
         </Button>
       </form>

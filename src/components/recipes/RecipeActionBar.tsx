@@ -89,7 +89,7 @@ export function RecipeActionBar({ isAiGenerated, onModifyWithAI, onDelete }: Rec
       <div className="flex items-center gap-2 flex-wrap">
         {/* Modify with AI - Only show for non-AI recipes */}
         {!isAiGenerated && (
-          <Button onClick={onModifyWithAI} className="gap-2">
+          <Button onClick={onModifyWithAI} className="gap-2" data-testid="modify-with-ai-button">
             <SparklesIcon className="h-4 w-4" />
             <span className="hidden sm:inline">Modify with AI</span>
             <span className="sm:hidden">AI Modify</span>
@@ -100,12 +100,16 @@ export function RecipeActionBar({ isAiGenerated, onModifyWithAI, onDelete }: Rec
       {/* Overflow Menu */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="icon" aria-label="More actions">
+          <Button variant="outline" size="icon" aria-label="More actions" data-testid="more-actions-button">
             <MoreVerticalIcon className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={onDelete} className="text-destructive focus:text-destructive gap-2">
+          <DropdownMenuItem
+            onClick={onDelete}
+            className="text-destructive focus:text-destructive gap-2"
+            data-testid="delete-recipe-menu-item"
+          >
             <TrashIcon className="h-4 w-4" />
             <span>Delete</span>
           </DropdownMenuItem>

@@ -20,20 +20,25 @@ export function RecipeCard({ recipe, showAIBadge }: RecipeCardProps) {
     <a
       href={`/recipes/${recipe.id}`}
       className="block group transition-transform hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-xl"
+      data-testid="recipe-card"
     >
       <Card className="h-full transition-all group-hover:shadow-md group-hover:border-primary/50">
         <CardHeader>
           <div className="flex items-start justify-between gap-2">
-            <CardTitle className="text-lg group-hover:text-primary transition-colors">{displayTitle}</CardTitle>
+            <CardTitle className="text-lg group-hover:text-primary transition-colors" data-testid="recipe-card-title">
+              {displayTitle}
+            </CardTitle>
             {showAIBadge && recipe.is_ai_generated && (
-              <Badge variant="secondary" className="shrink-0">
+              <Badge variant="secondary" className="shrink-0" data-testid="ai-badge">
                 AI
               </Badge>
             )}
           </div>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">{formattedDate}</p>
+          <p className="text-sm text-muted-foreground" data-testid="recipe-card-date">
+            {formattedDate}
+          </p>
         </CardContent>
       </Card>
     </a>

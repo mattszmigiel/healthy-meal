@@ -28,15 +28,17 @@ export function RecipeContent({ recipe }: RecipeContentProps) {
   return (
     <div className="space-y-6">
       {/* Title */}
-      <h1 className="text-4xl font-bold tracking-tight">{displayTitle}</h1>
+      <h1 className="text-4xl font-bold tracking-tight" data-testid="recipe-title">
+        {displayTitle}
+      </h1>
 
       {/* Metadata */}
       <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-        <div>
+        <div data-testid="recipe-created-date">
           <span className="font-medium">Created:</span> {createdDate}
         </div>
         {showUpdatedDate && (
-          <div>
+          <div data-testid="recipe-updated-date">
             <span className="font-medium">Updated:</span> {updatedDate}
           </div>
         )}
@@ -46,18 +48,22 @@ export function RecipeContent({ recipe }: RecipeContentProps) {
       {recipe.is_ai_generated && recipe.parent_recipe_id && <AIIndicator parentRecipeId={recipe.parent_recipe_id} />}
 
       {/* Ingredients Section */}
-      <section className="space-y-3">
+      <section className="space-y-3" data-testid="recipe-ingredients-section">
         <h2 className="text-2xl font-semibold">Ingredients</h2>
         <div className="rounded-lg border border-border bg-muted/50 p-4">
-          <p className="whitespace-pre-wrap text-foreground">{recipe.ingredients}</p>
+          <p className="whitespace-pre-wrap text-foreground" data-testid="recipe-ingredients-content">
+            {recipe.ingredients}
+          </p>
         </div>
       </section>
 
       {/* Instructions Section */}
-      <section className="space-y-3">
+      <section className="space-y-3" data-testid="recipe-instructions-section">
         <h2 className="text-2xl font-semibold">Instructions</h2>
         <div className="rounded-lg border border-border bg-muted/50 p-4">
-          <p className="whitespace-pre-wrap text-foreground">{recipe.instructions}</p>
+          <p className="whitespace-pre-wrap text-foreground" data-testid="recipe-instructions-content">
+            {recipe.instructions}
+          </p>
         </div>
       </section>
     </div>
