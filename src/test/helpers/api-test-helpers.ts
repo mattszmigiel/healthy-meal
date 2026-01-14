@@ -2,8 +2,14 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { vi } from "vitest";
 import type { APIContext } from "astro";
 
+interface RequestOverrides {
+  method?: string;
+  body?: string;
+  headers?: Record<string, string>;
+}
+
 interface MockAPIContextOverrides {
-  request?: Partial<Request>;
+  request?: RequestOverrides;
   locals?: Partial<APIContext["locals"]>;
   params?: Record<string, string>;
   cookies?: Partial<APIContext["cookies"]>;
@@ -21,6 +27,8 @@ export function createMockSupabaseClient(): Partial<SupabaseClient> {
       signUp: vi.fn(),
       signOut: vi.fn(),
       resetPasswordForEmail: vi.fn(),
+      exchangeCodeForSession: vi.fn(),
+      updateUser: vi.fn(),
     } as unknown,
     from: vi.fn(() => ({
       select: vi.fn().mockReturnThis(),
@@ -38,23 +46,34 @@ export function createMockSupabaseClient(): Partial<SupabaseClient> {
  * Creates a mock APIContext for testing API routes
  */
 export function createMockAPIContext(overrides: MockAPIContextOverrides = {}) {
+  // Build Request init options
+  const requestInit: RequestInit = {
+    method: overrides.request?.method || "GET",
+  };
+
+  // Add body if provided
+  if (overrides.request?.body) {
+    requestInit.body = overrides.request.body;
+  }
+
+  // Add headers if provided
+  if (overrides.request?.headers) {
+    requestInit.headers = overrides.request.headers;
+  }
+
   return {
-    request: new Request("http://localhost:3000/api/test", {
-      method: "GET",
-      ...overrides.request,
-    }),
+    request: new Request("http://localhost:3000/api/test", requestInit),
     locals: {
       supabase: createMockSupabaseClient(),
       ...overrides.locals,
     },
-    params: {},
+    params: overrides.params || {},
     cookies: {
       get: vi.fn(),
       set: vi.fn(),
       delete: vi.fn(),
       has: vi.fn(),
     },
-    ...overrides,
   };
 }
 
