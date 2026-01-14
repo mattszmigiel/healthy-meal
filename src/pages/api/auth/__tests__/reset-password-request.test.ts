@@ -232,6 +232,7 @@ describe("POST /api/auth/reset-password-request", () => {
     });
 
     it("should log errors server-side without exposing to client", async () => {
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
       const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
       mockContext = createMockAPIContext({
@@ -242,9 +243,7 @@ describe("POST /api/auth/reset-password-request", () => {
         },
       });
 
-      vi.mocked(mockContext.locals.supabase.auth.resetPasswordForEmail).mockRejectedValue(
-        new Error("Internal error")
-      );
+      vi.mocked(mockContext.locals.supabase.auth.resetPasswordForEmail).mockRejectedValue(new Error("Internal error"));
 
       const response = await POST(mockContext);
       const body = await parseResponse(response);

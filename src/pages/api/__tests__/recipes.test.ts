@@ -46,7 +46,9 @@ describe("GET /api/recipes", () => {
         range: vi.fn().mockResolvedValue({ data: [], error: null, count: 0 }),
       };
 
-      vi.mocked(mockContext.locals.supabase.from).mockReturnValue(mockQuery as any);
+      vi.mocked(mockContext.locals.supabase.from).mockReturnValue(
+        mockQuery as unknown as ReturnType<typeof mockContext.locals.supabase.from>
+      );
 
       const response = await GET(mockContext);
 
@@ -80,7 +82,9 @@ describe("GET /api/recipes", () => {
         range: vi.fn().mockResolvedValue({ data: [], error: null, count: 0 }),
       };
 
-      vi.mocked(mockContext.locals.supabase.from).mockReturnValue(mockQuery as any);
+      vi.mocked(mockContext.locals.supabase.from).mockReturnValue(
+        mockQuery as unknown as ReturnType<typeof mockContext.locals.supabase.from>
+      );
 
       const response = await GET(mockContext);
 
@@ -103,7 +107,9 @@ describe("GET /api/recipes", () => {
         range: vi.fn().mockRejectedValue(new Error("Database error")),
       };
 
-      vi.mocked(mockContext.locals.supabase.from).mockReturnValue(mockQuery as any);
+      vi.mocked(mockContext.locals.supabase.from).mockReturnValue(
+        mockQuery as unknown as ReturnType<typeof mockContext.locals.supabase.from>
+      );
 
       const response = await GET(mockContext);
       const body = await parseResponse(response);
@@ -204,7 +210,9 @@ describe("POST /api/recipes", () => {
         single: vi.fn().mockResolvedValue({ data: createdRecipe, error: null }),
       };
 
-      vi.mocked(mockContext.locals.supabase.from).mockReturnValue(mockInsertQuery as any);
+      vi.mocked(mockContext.locals.supabase.from).mockReturnValue(
+        mockInsertQuery as unknown as ReturnType<typeof mockContext.locals.supabase.from>
+      );
 
       const response = await POST(mockContext);
       const body = await parseResponse(response);
@@ -243,7 +251,9 @@ describe("POST /api/recipes", () => {
         single: vi.fn().mockRejectedValue(new Error("Database error")),
       };
 
-      vi.mocked(mockContext.locals.supabase.from).mockReturnValue(mockInsertQuery as any);
+      vi.mocked(mockContext.locals.supabase.from).mockReturnValue(
+        mockInsertQuery as unknown as ReturnType<typeof mockContext.locals.supabase.from>
+      );
 
       const response = await POST(mockContext);
       const body = await parseResponse(response);

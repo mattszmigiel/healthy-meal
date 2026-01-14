@@ -235,9 +235,7 @@ describe("POST /api/auth/register", () => {
         },
       });
 
-      vi.mocked(mockContext.locals.supabase.auth.signUp).mockRejectedValue(
-        new Error("Database connection failed")
-      );
+      vi.mocked(mockContext.locals.supabase.auth.signUp).mockRejectedValue(new Error("Database connection failed"));
 
       const response = await POST(mockContext);
       const body = await parseResponse(response);
